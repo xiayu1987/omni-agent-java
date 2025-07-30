@@ -1,4 +1,4 @@
-package com.beraising.agent.omni.core.agents;
+package com.beraising.agent.omni.core.context.impl;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -7,15 +7,18 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.stereotype.Component;
 
+import com.beraising.agent.omni.core.agents.AgentRegistry;
+import com.beraising.agent.omni.core.context.IAgentStaticContext;
+
 @Component
-public class AgentContext {
+public class AgentStaticContext implements IAgentStaticContext {
     private final ChatClient.Builder chatClientBuilder;
     private final ChatMemoryRepository memoryRepository;
     private final AgentRegistry agentRegistry;
 
     private final int MAX_MESSAGES = 100;
 
-    public AgentContext(AgentRegistry agentRegistry, ChatClient.Builder chatClientBuilder,
+    public AgentStaticContext(AgentRegistry agentRegistry, ChatClient.Builder chatClientBuilder,
             ChatMemoryRepository memoryRepository) {
         this.agentRegistry = agentRegistry;
         this.chatClientBuilder = chatClientBuilder;
@@ -34,14 +37,17 @@ public class AgentContext {
                         new SimpleLoggerAdvisor());
     }
 
+    @Override
     public AgentRegistry getAgentRegistry() {
         return agentRegistry;
     }
 
+    @Override
     public ChatClient.Builder getChatClientBuilder() {
         return chatClientBuilder;
     }
 
+    @Override
     public ChatMemoryRepository getMemoryRepository() {
         return memoryRepository;
     }

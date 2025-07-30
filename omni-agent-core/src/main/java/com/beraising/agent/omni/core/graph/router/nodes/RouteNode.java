@@ -19,7 +19,7 @@ public class RouteNode extends GraphNodeBase<RouterState> {
 
         String content = getChatClient().prompt(state.getUserQuery()).toolCallbacks(
 
-                getAgentContext().getAgentRegistry().getAgentMap().entrySet().stream().map(entry -> {
+               getAgentStaticContext().getAgentRegistry().getAgentMap().entrySet().stream().map(entry -> {
                     return entry.getValue().asToolCallback();
                 }).collect(Collectors.toList())
 

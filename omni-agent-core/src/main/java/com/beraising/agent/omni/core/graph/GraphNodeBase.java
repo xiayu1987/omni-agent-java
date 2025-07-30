@@ -6,7 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
-import com.beraising.agent.omni.core.agents.AgentContext;
+import com.beraising.agent.omni.core.context.IAgentStaticContext;
 
 public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction {
 
@@ -21,15 +21,15 @@ public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction
     }
 
     protected ChatClient.Builder getChatClientBuilder() {
-        return graph.getAgent().getAgentContext().getChatClientBuilder();
+        return graph.getAgent().getAgentStaticContext().getChatClientBuilder();
     }
 
     protected ChatClient getChatClient() {
-        return graph.getAgent().getAgentContext().getChatClientBuilder().build();
+        return graph.getAgent().getAgentStaticContext().getChatClientBuilder().build();
     }
 
-    protected AgentContext getAgentContext() {
-        return graph.getAgent().getAgentContext();
+    protected IAgentStaticContext getAgentStaticContext() {
+        return graph.getAgent().getAgentStaticContext();
     }
 
     @Override
