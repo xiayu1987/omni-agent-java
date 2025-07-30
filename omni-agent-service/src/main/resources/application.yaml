@@ -1,0 +1,53 @@
+server:
+    port: 20003
+
+spring:
+  application:
+    name: omni-agent-service
+
+
+  ai:
+    # openai:
+    #   api-key: sk-fake-key
+    #   base-url: http://100.64.0.1:12340/
+    #   embedding:
+    #     api-key: sk-fake-key
+    #     base-url:  http://100.64.0.1:12340/
+    #     options:
+    #       model: text-embedding-all-minilm-l6-v2-embedding
+    #   chat:
+    #     options:
+    #       model: qwen3-14b
+
+    dashscope:
+      api-key: sk-f03153e453304d70bdcc236c2993d4be
+
+    # memory:
+    #   redis:
+    #     host: localhost
+    #     port: 6379
+    #     password:
+    #     timeout:  5000
+    # chat:
+    #   memory:
+    #     repository:
+    #       jdbc:
+    #         mysql:
+    #           jdbc-url: jdbc:mysql://localhost:3306/spring_ai_alibaba_mysql?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&tinyInt1isBit=false&allowLoadLocalInfile=true&allowLocalInfile=true&allowUrl
+    #           username: root
+    #           password: root
+    #           driver-class-name: com.mysql.cj.jdbc.Driver
+    #           enabled: true
+
+
+logging:
+  level:
+    '[com.alibaba.dashscope.api]': DEBUG
+    '[com.alibaba.cloud.ai.dashscope]': DEBUG
+    '[com.alibaba.cloud.ai.dashscope.chat]': DEBUG
+    '[org.springframework.ai]': DEBUG
+    '[org.springframework.web.client.RestTemplate]': DEBUG
+    '[org.springframework.http.client]': DEBUG
+    '[org.springframework.web.reactive.function.client.ExchangeFunctions]': TRACE
+    '[org.springframework.ai.tool]': DEBUG
+    '[org.springframework.ai.chat]': DEBUG

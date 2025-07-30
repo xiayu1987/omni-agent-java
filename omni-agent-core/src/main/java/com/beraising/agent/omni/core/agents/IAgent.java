@@ -1,0 +1,35 @@
+package com.beraising.agent.omni.core.agents;
+
+import org.springframework.ai.tool.function.FunctionToolCallback;
+
+import com.beraising.agent.omni.core.graph.IGraph;
+import com.beraising.agent.omni.core.session.IAgentSession;
+
+import lombok.Data;
+
+public interface IAgent {
+
+    String getName();
+
+    String getDescription();
+
+    AgentContext getAgentContext();
+
+    IGraph getGraph();
+
+    void init() throws Exception;
+
+    IAgentSession invoke(IAgentSession agentSession);
+
+    FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback();
+
+    @Data
+    public class AsToolRequest {
+        private String sessionID;
+    }
+
+    @Data
+    public class AsToolResponse {
+        private String sessionID;
+    }
+}
