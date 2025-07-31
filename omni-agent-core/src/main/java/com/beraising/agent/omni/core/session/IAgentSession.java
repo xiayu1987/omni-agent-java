@@ -6,6 +6,6 @@ public interface IAgentSession {
 
     List<IAgentSessionPart> getAgentSessionPart();
 
-    void setAgentSessionPart(List<IAgentSessionPart> agentSessionPart);
+    void addAgentSessionPart(IAgentSessionPart agentSessionPart);
 
 }

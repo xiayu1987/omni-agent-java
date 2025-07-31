@@ -1,5 +1,6 @@
 package com.beraising.agent.omni.core.session.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -12,12 +13,17 @@ public class AgentSession implements IAgentSession {
 
     private List<IAgentSessionPart> agentSessionPart;
 
+    public AgentSession() {
+        super();
+        agentSessionPart = new ArrayList<>();
+    }
+
     public List<IAgentSessionPart> getAgentSessionPart() {
         return agentSessionPart;
     }
 
-    public void setAgentSessionPart(List<IAgentSessionPart> agentSessionPart) {
-        this.agentSessionPart = agentSessionPart;
+    public void addAgentSessionPart(IAgentSessionPart agentSessionPart) {
+        this.agentSessionPart.add(agentSessionPart);
     }
 
 }

@@ -1,5 +1,5 @@
 package com.beraising.agent.omni.core.context;
 
-public interface IContext {
+public interface IAgentContext {
 
 }

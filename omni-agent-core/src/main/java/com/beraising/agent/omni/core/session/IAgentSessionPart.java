@@ -1,5 +1,16 @@
 package com.beraising.agent.omni.core.session;
 
-public interface IAgentSessionStep {
+import com.beraising.agent.omni.core.agents.IAgent;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+
+public interface IAgentSessionPart {
+
+    IAgent getAgent();
+
+    void setAgent(IAgent agent);
+
+    IAgentRuntimeContext getAgentRuntimeContext();
+
+    void setAgentRuntimeContext(IAgentRuntimeContext agentRuntimeContext);
 
 }

@@ -28,7 +28,7 @@ public class OmniAgentServiceApplication {
 
 		return args -> {
 
-			omniAgent.init();
+			omniAgent.init(null);
 			omniAgent.invoke(null);
 
 			context.close();
