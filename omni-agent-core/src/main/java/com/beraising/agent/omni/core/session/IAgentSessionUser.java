@@ -1,0 +1,6 @@
+package com.beraising.agent.omni.core.session;
+
+public interface IAgentSessionUser {
+
+    String getUserId();
+}

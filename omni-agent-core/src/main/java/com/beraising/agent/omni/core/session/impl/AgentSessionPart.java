@@ -1,16 +1,14 @@
 package com.beraising.agent.omni.core.session.impl;
 
-import org.springframework.stereotype.Component;
-
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.session.IAgentSessionPart;
 
-@Component
 public class AgentSessionPart implements IAgentSessionPart {
 
     private IAgent agent;
     private IAgentRuntimeContext agentRuntimeContext;
+    private boolean current;
 
     public IAgent getAgent() {
         return agent;
@@ -26,6 +24,16 @@ public class AgentSessionPart implements IAgentSessionPart {
 
     public void setAgentRuntimeContext(IAgentRuntimeContext agentRuntimeContext) {
         this.agentRuntimeContext = agentRuntimeContext;
+    }
+
+    @Override
+    public boolean isCurrent() {
+        return current;
+    }
+
+    @Override
+    public void setCurrent(boolean current) {
+        this.current = current;
     }
 
 }

@@ -4,8 +4,15 @@ import java.util.List;
 
 public interface IAgentSession {
 
-    List<IAgentSessionPart> getAgentSessionPart();
+    String getAgentSessionId();
 
-    void addAgentSessionPart(IAgentSessionPart agentSessionPart);
+    void setAgentSessionId(String agentSessionId);
 
+    List<IAgentSessionPart> getAgentSessionParts();
+
+    void setAgentSessionParts(List<IAgentSessionPart> agentSessionParts);
+
+    IAgentSessionUser getAgentSessionUser();
+
+    void setAgentSessionUser(IAgentSessionUser agentSessionUser);
 }
