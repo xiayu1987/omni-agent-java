@@ -5,6 +5,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.graph.IGraph;
+import com.beraising.agent.omni.core.graph.IGraphState;
 
 import lombok.Data;
 
@@ -16,11 +17,13 @@ public interface IAgent {
 
     IAgentStaticContext getAgentStaticContext();
 
-    IGraph getGraph();
+    <T extends IGraphState> IGraph<T> getGraph();
 
     void init(IAgentListener agentListener) throws Exception;
 
-    void invoke(IAgentRuntimeContext agentRuntimeContext);
+    void invoke(String userQuery);
+
+    void invoke(String userQuery, IAgentRuntimeContext agentRuntimeContext);
 
     FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback();
 

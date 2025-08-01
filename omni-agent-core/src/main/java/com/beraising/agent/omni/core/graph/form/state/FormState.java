@@ -5,22 +5,26 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
-import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
-import com.beraising.agent.omni.core.graph.IGraphState;
+import com.beraising.agent.omni.core.graph.GraphStateBase;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
 
-public class FormState implements IGraphState {
+public class FormState extends GraphStateBase {
 
-    private OverAllState state;
-
-    public FormState(OverAllState state) {
-        this.state = state;
+    @Override
+    public Map<String, Object> createUserQuery(String userQuery) {
+        Map<String, Object> userQueryMap = new HashMap<>();
+        userQueryMap.put("user_query", userQuery);
+        return userQueryMap;
     }
 
     public String getUserQuery() {
-        return state.value("user_query", "");
+        return getState().value("user_query", "");
+    }
+
+    public String getRouterResult() {
+        return getState().value("router_result", "");
     }
 
     public IUpdatedGraphState<RouterState> getUpdatedUserQuery(String value) {
@@ -31,10 +35,6 @@ public class FormState implements IGraphState {
         };
     }
 
-    public String getRouterResult() {
-        return state.value("router_result", "");
-    }
-
     public IUpdatedGraphState<RouterState> getUpdatedRouterResult(String value) {
         return () -> {
             Map<String, Object> result = new HashMap<>();
@@ -43,7 +43,8 @@ public class FormState implements IGraphState {
         };
     }
 
-    public static KeyStrategyFactory getKeyStrategyFactory() {
+    @Override
+    public KeyStrategyFactory getKeyStrategyFactory() {
         KeyStrategyFactory keyStrategyFactory = () -> {
             HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
 

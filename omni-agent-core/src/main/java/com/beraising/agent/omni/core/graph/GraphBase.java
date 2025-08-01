@@ -1,15 +1,11 @@
 package com.beraising.agent.omni.core.graph;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import com.alibaba.cloud.ai.graph.OverAllState;
 import com.beraising.agent.omni.core.agents.IAgent;
 
-public abstract class GraphBase implements IGraph {
+public abstract class GraphBase<T extends IGraphState> implements IGraph<T> {
 
     private IAgent agent;
+    private T graphState;
 
     @Override
     public void setAgent(IAgent agent) {
@@ -21,16 +17,29 @@ public abstract class GraphBase implements IGraph {
         return agent;
     }
 
+    public T getGraphState() {
+        return graphState;
+    }
+
+    public void setGraphState(T graphState) {
+        this.graphState = graphState;
+    }
+
+    public abstract T newGraphState();
+
     @Override
-    public Optional<OverAllState> invoke(Map<String, Object> inputs) throws Exception {
+    public void invoke(String userQuery) throws Exception {
 
-        inputs = new HashMap<>() {
-            {
-                put("user_query", "我明天请假");
-            }
-        };
+        T graphState = newGraphState();
 
-        return getStateGraph().compile().invoke(inputs);
+        this.setGraphState(graphState);
+
+        getStateGraph().compile().invoke(graphState.createUserQuery(userQuery));
+    }
+
+    @Override
+    public void invoke(String userQuery, T graphState) throws Exception {
+
     }
 
 }

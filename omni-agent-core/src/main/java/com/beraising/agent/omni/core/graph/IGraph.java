@@ -1,17 +1,19 @@
 package com.beraising.agent.omni.core.graph;
 
-import java.util.Map;
-import java.util.Optional;
-
-import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
 
-public interface IGraph {
+public interface IGraph<T extends IGraphState> {
 
-    Optional<OverAllState> invoke(Map<String, Object> inputs) throws Exception;
+    void invoke(String userQuery, T graphState) throws Exception;
+
+    void invoke(String userQuery) throws Exception;
 
     StateGraph getStateGraph() throws Exception;
+
+    T getGraphState();
+
+    void setGraphState(T graphState);
 
     void setAgent(IAgent agent);
 

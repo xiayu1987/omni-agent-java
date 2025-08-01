@@ -8,15 +8,15 @@ import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 
-public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction {
+public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction, IGraphNode<T> {
 
-    private IGraph graph;
+    private IGraph<T> graph;
 
-    public GraphNodeBase(IGraph graph) {
+    public GraphNodeBase(IGraph<T> graph) {
         this.graph = graph;
     }
 
-    public IGraph getGraph() {
+    public IGraph<T> getGraph() {
         return graph;
     }
 
@@ -39,6 +39,14 @@ public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction
 
     public abstract IUpdatedGraphState<T> apply(T state) throws Exception;
 
-    public abstract T getGraphState(OverAllState state) throws Exception;
+    public T getGraphState(OverAllState state) {
+        graph.getGraphState().setState(state);
+        return graph.getGraphState();
+    }
+
+    @Override
+    public T getGraphState() {
+        return graph.getGraphState();
+    }
 
 }
