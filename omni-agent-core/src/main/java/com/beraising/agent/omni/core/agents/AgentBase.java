@@ -38,7 +38,13 @@ public abstract class AgentBase implements IAgent {
                 getName(), new Function<AsToolRequest, AsToolResponse>() {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
-                        return null;
+                        try {
+                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, null);
+                        } catch (Exception e) {
+
+                            e.printStackTrace();
+                        }
+                        return new AsToolResponse();
                     }
                 })
                 .description(getDescription())

@@ -8,6 +8,7 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.agents.AgentRegistry;
+import com.beraising.agent.omni.core.agents.IAgentEngine;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 
 @Component
@@ -15,14 +16,17 @@ public class AgentStaticContext implements IAgentStaticContext {
     private final ChatClient.Builder chatClientBuilder;
     private final ChatMemoryRepository memoryRepository;
     private final AgentRegistry agentRegistry;
+    private final IAgentEngine agentEngine;
 
     private final int MAX_MESSAGES = 100;
 
-    public AgentStaticContext(AgentRegistry agentRegistry, ChatClient.Builder chatClientBuilder,
+    public AgentStaticContext(IAgentEngine agentEngine, AgentRegistry agentRegistry,
+            ChatClient.Builder chatClientBuilder,
             ChatMemoryRepository memoryRepository) {
         this.agentRegistry = agentRegistry;
         this.chatClientBuilder = chatClientBuilder;
         this.memoryRepository = memoryRepository;
+        this.agentEngine = agentEngine;
 
         this.chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(
@@ -50,6 +54,11 @@ public class AgentStaticContext implements IAgentStaticContext {
     @Override
     public ChatMemoryRepository getMemoryRepository() {
         return memoryRepository;
+    }
+
+    @Override
+    public IAgentEngine getAgentEngine() {
+        return agentEngine;
     }
 
 }

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 
 import com.beraising.agent.omni.core.agents.EAgentRequestType;
-import com.beraising.agent.omni.core.agents.OmniAgentEngine;
+import com.beraising.agent.omni.core.agents.IAgentEngine;
 import com.beraising.agent.omni.core.agents.impl.AgentRequest;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
@@ -27,7 +27,7 @@ public class OmniAgentServiceApplication {
 
 	@Bean
 	@Order(1)
-	public CommandLineRunner start(OmniAgentEngine omniAgentEngine,
+	public CommandLineRunner start(IAgentEngine omniAgentEngine,
 			ConfigurableApplicationContext context) {
 
 		return args -> {
