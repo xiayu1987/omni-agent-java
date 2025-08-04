@@ -9,7 +9,7 @@ import com.beraising.agent.omni.core.graph.router.state.RouterState;
 
 public class RouteNode extends GraphNodeBase<RouterState> {
 
-    public RouteNode(IGraph<RouterState> graph) {
+    public RouteNode(IGraph graph) {
         super(graph);
     }
 

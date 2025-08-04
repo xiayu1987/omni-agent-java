@@ -2,10 +2,10 @@ package com.beraising.agent.omni.core.graph;
 
 import com.beraising.agent.omni.core.agents.IAgent;
 
-public abstract class GraphBase<T extends IGraphState> implements IGraph<T> {
+public abstract class GraphBase<T extends IGraphState> implements IGraph {
 
     private IAgent agent;
-    private T graphState;
+    private IGraphState graphState;
 
     @Override
     public void setAgent(IAgent agent) {
@@ -17,20 +17,20 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph<T> {
         return agent;
     }
 
-    public T getGraphState() {
+    public IGraphState getGraphState() {
         return graphState;
     }
 
-    public void setGraphState(T graphState) {
+    public void setGraphState(IGraphState graphState) {
         this.graphState = graphState;
     }
 
-    public abstract T newGraphState();
+    public abstract IGraphState newGraphState();
 
     @Override
     public void invoke(String userQuery) throws Exception {
 
-        T graphState = newGraphState();
+        IGraphState graphState = newGraphState();
 
         this.setGraphState(graphState);
 
@@ -38,7 +38,7 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph<T> {
     }
 
     @Override
-    public void invoke(String userQuery, T graphState) throws Exception {
+    public void invoke(String userQuery, IGraphState graphState) throws Exception {
 
     }
 

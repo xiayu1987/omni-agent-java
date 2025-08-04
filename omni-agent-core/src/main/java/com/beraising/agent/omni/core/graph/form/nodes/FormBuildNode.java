@@ -7,7 +7,7 @@ import com.beraising.agent.omni.core.graph.form.state.FormState;
 
 public class FormBuildNode extends GraphNodeBase<FormState> {
 
-    public FormBuildNode(IGraph<FormState> graph) {
+    public FormBuildNode(IGraph graph) {
         super(graph);
     }
 

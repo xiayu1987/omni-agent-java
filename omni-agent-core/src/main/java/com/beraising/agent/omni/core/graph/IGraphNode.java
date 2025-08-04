@@ -1,8 +1,8 @@
 package com.beraising.agent.omni.core.graph;
 
-public interface IGraphNode<T extends IGraphState> {
+public interface IGraphNode {
 
-    IGraph<T> getGraph();
+    IGraph getGraph();
 
-    T getGraphState();
+    IGraphState getGraphState();
 }
