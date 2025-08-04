@@ -17,18 +17,17 @@ public abstract class AgentBase implements IAgent {
     }
 
     @Override
-    public void invoke(String userQuery) {
-        invoke(userQuery, null);
+    public void invoke(IAgentRequest agentRequest) {
+        invoke(agentRequest, null);
     }
 
     @Override
-    public void invoke(String userQuery, IAgentRuntimeContext agentRuntimeContext) {
+    public void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
         try {
-            agentListener.beforeInvoke();
-            getGraph().invoke(userQuery);
-            agentListener.afterInvoke(agentRuntimeContext);
+            agentListener.beforeInvoke(agentRequest, agentRuntimeContext);
+            getGraph().invoke(agentRequest, agentRuntimeContext);
+            agentListener.afterInvoke(agentRequest, agentRuntimeContext);
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }

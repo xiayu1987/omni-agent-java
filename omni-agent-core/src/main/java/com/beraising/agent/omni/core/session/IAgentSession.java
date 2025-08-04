@@ -8,11 +8,7 @@ public interface IAgentSession {
 
     void setAgentSessionId(String agentSessionId);
 
-    List<IAgentSessionPart> getAgentSessionParts();
+    List<IAgentSessionItem> getAgentSessionItems();
 
-    void setAgentSessionParts(List<IAgentSessionPart> agentSessionParts);
-
-    IAgentSessionUser getAgentSessionUser();
-
-    void setAgentSessionUser(IAgentSessionUser agentSessionUser);
+    void setAgentSessionItems(List<IAgentSessionItem> agentSessionItems);
 }

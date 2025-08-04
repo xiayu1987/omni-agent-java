@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.beraising.agent.omni.core.session.IAgentSession;
-import com.beraising.agent.omni.core.session.IAgentSessionPart;
-import com.beraising.agent.omni.core.session.IAgentSessionUser;
+import com.beraising.agent.omni.core.session.IAgentSessionItem;
 
 public class AgentSession implements IAgentSession {
 
     private String agentSessionId;
-    private List<IAgentSessionPart> agentSessionParts;
-    private IAgentSessionUser agentSessionUser;
+    private List<IAgentSessionItem> agentSessionItems;
 
     public AgentSession() {
         super();
-        agentSessionParts = new ArrayList<>();
+        agentSessionItems = new ArrayList<>();
     }
 
     @Override
@@ -28,22 +26,13 @@ public class AgentSession implements IAgentSession {
         this.agentSessionId = agentSessionId;
     }
 
-    public List<IAgentSessionPart> getAgentSessionParts() {
-        return agentSessionParts;
+    public List<IAgentSessionItem> getAgentSessionItems() {
+        return agentSessionItems;
     }
 
-    public void setAgentSessionParts(List<IAgentSessionPart> agentSessionParts) {
-        this.agentSessionParts = agentSessionParts;
+    public void setAgentSessionItems(List<IAgentSessionItem> agentSessionItems) {
+        this.agentSessionItems = agentSessionItems;
     }
 
-    @Override
-    public IAgentSessionUser getAgentSessionUser() {
-        return agentSessionUser;
-    }
-
-    @Override
-    public void setAgentSessionUser(IAgentSessionUser agentSessionUser) {
-        this.agentSessionUser = agentSessionUser;
-    }
 
 }

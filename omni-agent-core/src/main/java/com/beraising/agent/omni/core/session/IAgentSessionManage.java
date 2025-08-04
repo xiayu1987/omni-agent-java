@@ -6,15 +6,13 @@ public interface IAgentSessionManage {
 
     List<IAgentSession> getAgentSessions();
 
-    List<IAgentSession> getAgentSessionsByUser(IAgentSessionUser user);
-
     IAgentSession getAgentSessionById(String sessionId);
 
-    IAgentSession createAgentSession(IAgentSessionUser user);
+    IAgentSession createAgentSession();
 
-    IAgentSession createAndAddAgentSession(IAgentSessionUser user);
+    IAgentSession createAndAddAgentSession();
 
-    IAgentSessionPart getCurrentSessionPart(IAgentSession agentSession);
+    IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);
 
     void clearAllSessions();
 

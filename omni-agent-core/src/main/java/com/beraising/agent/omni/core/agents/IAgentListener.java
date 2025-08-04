@@ -4,8 +4,8 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
 public interface IAgentListener {
 
-    void beforeInvoke() throws Exception;
+    void beforeInvoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) throws Exception;
 
-    void afterInvoke(IAgentRuntimeContext agentRuntimeContext) throws Exception;
+    void afterInvoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) throws Exception;
 
 }

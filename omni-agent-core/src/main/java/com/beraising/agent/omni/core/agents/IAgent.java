@@ -20,9 +20,9 @@ public interface IAgent {
 
     void init(IAgentListener agentListener) throws Exception;
 
-    void invoke(String userQuery);
+    void invoke(IAgentRequest agentRequest);
 
-    void invoke(String userQuery, IAgentRuntimeContext agentRuntimeContext);
+    void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentSession);
 
     FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback();
 

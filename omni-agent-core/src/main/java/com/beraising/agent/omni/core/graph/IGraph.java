@@ -2,12 +2,12 @@ package com.beraising.agent.omni.core.graph;
 
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
+import com.beraising.agent.omni.core.agents.IAgentRequest;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
 public interface IGraph {
 
-    void invoke(String userQuery, IGraphState graphState) throws Exception;
-
-    void invoke(String userQuery) throws Exception;
+    void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) throws Exception;
 
     StateGraph getStateGraph() throws Exception;
 

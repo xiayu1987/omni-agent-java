@@ -2,13 +2,13 @@ package com.beraising.agent.omni.core.session.impl;
 
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
-import com.beraising.agent.omni.core.session.IAgentSessionPart;
+import com.beraising.agent.omni.core.session.IAgentSessionItem;
 
-public class AgentSessionPart implements IAgentSessionPart {
+public class AgentSessionItem implements IAgentSessionItem {
 
     private IAgent agent;
-    private IAgentRuntimeContext agentRuntimeContext;
     private boolean current;
+    private IAgentRuntimeContext agentRuntimeContext;
 
     public IAgent getAgent() {
         return agent;
@@ -16,14 +16,6 @@ public class AgentSessionPart implements IAgentSessionPart {
 
     public void setAgent(IAgent agent) {
         this.agent = agent;
-    }
-
-    public IAgentRuntimeContext getAgentRuntimeContext() {
-        return agentRuntimeContext;
-    }
-
-    public void setAgentRuntimeContext(IAgentRuntimeContext agentRuntimeContext) {
-        this.agentRuntimeContext = agentRuntimeContext;
     }
 
     @Override
@@ -34,6 +26,16 @@ public class AgentSessionPart implements IAgentSessionPart {
     @Override
     public void setCurrent(boolean current) {
         this.current = current;
+    }
+
+    @Override
+    public IAgentRuntimeContext getAgentRuntimeContext() {
+        return agentRuntimeContext;
+    }
+
+    @Override
+    public void setAgentRuntimeContext(IAgentRuntimeContext agentRuntimeContext) {
+        this.agentRuntimeContext = agentRuntimeContext;
     }
 
 }

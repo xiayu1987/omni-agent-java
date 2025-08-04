@@ -3,7 +3,7 @@ package com.beraising.agent.omni.core.session;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
-public interface IAgentSessionPart {
+public interface IAgentSessionItem {
 
     boolean isCurrent();
 

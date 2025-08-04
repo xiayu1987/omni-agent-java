@@ -2,9 +2,13 @@ package com.beraising.agent.omni.core.graph.router.impl;
 
 import org.springframework.stereotype.Component;
 
+import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
+import com.beraising.agent.omni.core.agents.IAgentRequest;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.graph.GraphBase;
+import com.beraising.agent.omni.core.graph.IGraphStateBuilder;
 import com.beraising.agent.omni.core.graph.router.IAgentRouterGraph;
 import com.beraising.agent.omni.core.graph.router.nodes.RouteNode;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
@@ -17,7 +21,7 @@ public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRo
     @Override
     public StateGraph getStateGraph() throws Exception {
 
-        StateGraph stateGraph = new StateGraph(getGraphState().getKeyStrategyFactory())
+        StateGraph stateGraph = new StateGraph(getGraphStateBuilder().getKeyStrategyFactory())
                 .addNode(ROUTER_NODE_NAME, AsyncNodeAction.node_async(new RouteNode(this)))
 
                 .addEdge(StateGraph.START, ROUTER_NODE_NAME)
@@ -27,8 +31,20 @@ public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRo
     }
 
     @Override
-    public RouterState newGraphState() {
-        return new RouterState();
+    public IGraphStateBuilder<RouterState> getGraphStateBuilder() {
+        return  new IGraphStateBuilder<RouterState>(){
+
+            @Override
+            public RouterState build(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+                return new RouterState();
+            }
+
+            @Override
+            public KeyStrategyFactory getKeyStrategyFactory() {
+                return RouterState.getKeyStrategyFactory();
+            }
+
+        };
     }
 
 }
