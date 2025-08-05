@@ -2,8 +2,10 @@ package com.beraising.agent.omni.core.agents;
 
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
-import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.IGraph;
 
 import lombok.Data;
@@ -16,13 +18,13 @@ public interface IAgent {
 
     IAgentStaticContext getAgentStaticContext();
 
+    IAgentRuntimeContextBuilder getAgentRuntimeContextBuilder();
+
     IGraph getGraph();
 
-    void init(IAgentListener agentListener) throws Exception;
+    void init(IEventListener agentListener) throws Exception;
 
-    void invoke(IAgentRequest agentRequest);
-
-    void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentSession);
+    void invoke(IAgentEvent agentEvent);
 
     FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback();
 

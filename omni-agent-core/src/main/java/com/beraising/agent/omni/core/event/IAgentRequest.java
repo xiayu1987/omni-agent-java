@@ -1,6 +1,8 @@
-package com.beraising.agent.omni.core.agents;
+package com.beraising.agent.omni.core.event;
 
 import java.util.Map;
+
+import com.beraising.agent.omni.core.agents.EAgentRequestType;
 
 public interface IAgentRequest {
 

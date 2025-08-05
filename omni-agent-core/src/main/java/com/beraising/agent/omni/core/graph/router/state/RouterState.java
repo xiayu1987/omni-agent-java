@@ -5,29 +5,20 @@ import java.util.Map;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.graph.GraphStateBase;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 
 public class RouterState extends GraphStateBase {
 
-    public static KeyStrategyFactory getKeyStrategyFactory() {
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-
-            keyStrategyHashMap.put("user_query", new ReplaceStrategy());
-            keyStrategyHashMap.put("router_result", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
-
-        return keyStrategyFactory;
+    public RouterState() {
+        super();
     }
 
     @Override
-    public Map<String, Object> createInput(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+    public Map<String, Object> createInput(IAgentRuntimeContext agentRuntimeContext) {
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("user_query", agentRequest.getText());
+        inputMap.put("user_query", agentRuntimeContext.getAgentEvent().getAgentRequest());
         return inputMap;
     }
 
@@ -53,6 +44,18 @@ public class RouterState extends GraphStateBase {
             result.put("router_result", value);
             return result;
         };
+    }
+
+    public static KeyStrategyFactory getKeyStrategyFactory() {
+        KeyStrategyFactory keyStrategyFactory = () -> {
+            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+
+            keyStrategyHashMap.put("user_query", new ReplaceStrategy());
+            keyStrategyHashMap.put("router_result", new ReplaceStrategy());
+            return keyStrategyHashMap;
+        };
+
+        return keyStrategyFactory;
     }
 
 }

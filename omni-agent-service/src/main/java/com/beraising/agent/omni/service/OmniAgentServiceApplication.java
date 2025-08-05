@@ -13,7 +13,8 @@ import org.springframework.core.annotation.Order;
 
 import com.beraising.agent.omni.core.agents.EAgentRequestType;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
-import com.beraising.agent.omni.core.agents.impl.AgentRequest;
+import com.beraising.agent.omni.core.event.impl.AgentEvent;
+import com.beraising.agent.omni.core.event.impl.AgentRequest;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = {
@@ -32,8 +33,12 @@ public class OmniAgentServiceApplication {
 
 		return args -> {
 
-			omniAgentEngine.invoke(AgentRequest.builder().requestType(EAgentRequestType.TEXT).text("我想明天请假")
-					.data(new HashMap<>()).build());
+			omniAgentEngine.invoke(AgentEvent.builder()
+					.agentRequest(
+							AgentRequest.builder().requestType(EAgentRequestType.TEXT).text("我想明天请假")
+									.data(new HashMap<>()).build())
+					.agentResponse(null)
+					.agentSession(null).build());
 
 			context.close();
 		};

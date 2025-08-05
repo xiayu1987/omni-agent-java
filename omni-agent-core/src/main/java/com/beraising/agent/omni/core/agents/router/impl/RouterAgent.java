@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.agents.AgentBase;
 import com.beraising.agent.omni.core.agents.router.IRouterAgent;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.graph.IGraph;
 import com.beraising.agent.omni.core.graph.router.IAgentRouterGraph;
@@ -12,13 +13,17 @@ import com.beraising.agent.omni.core.graph.router.IAgentRouterGraph;
 public class RouterAgent extends AgentBase implements IRouterAgent {
 
     private final IAgentRouterGraph agentRouterGraph;
+    private final IAgentRuntimeContextBuilder agentRuntimeContextBuilder;
     private final IAgentStaticContext agentStaticContext;
 
-    public RouterAgent(IAgentStaticContext agentStaticContext,
-            IAgentRouterGraph agentRouterGraph) {
+    public RouterAgent(
+            IAgentRouterGraph agentRouterGraph,
+            IAgentStaticContext agentStaticContext,
+            IAgentRuntimeContextBuilder agentRuntimeContextBuilder) {
 
         this.agentRouterGraph = agentRouterGraph;
         this.agentStaticContext = agentStaticContext;
+        this.agentRuntimeContextBuilder = agentRuntimeContextBuilder;
     }
 
     @Override
@@ -39,6 +44,11 @@ public class RouterAgent extends AgentBase implements IRouterAgent {
     @Override
     public IAgentStaticContext getAgentStaticContext() {
         return this.agentStaticContext;
+    }
+
+    @Override
+    public IAgentRuntimeContextBuilder getAgentRuntimeContextBuilder() {
+        return this.agentRuntimeContextBuilder;
     }
 
 }

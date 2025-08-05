@@ -47,14 +47,19 @@ public class AgentSessionManage implements IAgentSessionManage {
     }
 
     @Override
+    public IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession) {
+        return agentSession.getAgentSessionItems().stream()
+                .filter(item -> item.isCurrent()).findFirst().orElse(null);
+    }
+
+    @Override
     public void clearAllSessions() {
         this.agentSessions.clear();
     }
 
     @Override
-    public IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession) {
-        return agentSession.getAgentSessionItems().stream()
-                .filter(item -> item.isCurrent()).findFirst().orElse(null);
+    public void addSessionItem(IAgentSession agentSession, IAgentSessionItem sessionItem) {
+        agentSession.getAgentSessionItems().add(sessionItem);
     }
 
 }

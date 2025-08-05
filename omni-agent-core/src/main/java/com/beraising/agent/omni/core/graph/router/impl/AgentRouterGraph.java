@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.graph.GraphBase;
 import com.beraising.agent.omni.core.graph.IGraphStateBuilder;
@@ -32,10 +31,10 @@ public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRo
 
     @Override
     public IGraphStateBuilder<RouterState> getGraphStateBuilder() {
-        return  new IGraphStateBuilder<RouterState>(){
+        return new IGraphStateBuilder<RouterState>() {
 
             @Override
-            public RouterState build(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+            public RouterState build(IAgentRuntimeContext agentRuntimeContext) {
                 return new RouterState();
             }
 

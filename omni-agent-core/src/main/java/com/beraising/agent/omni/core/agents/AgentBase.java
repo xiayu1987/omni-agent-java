@@ -4,29 +4,32 @@ import java.util.function.Function;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.IEventListener;
+import com.beraising.agent.omni.core.event.IAgentRequest;
 
 public abstract class AgentBase implements IAgent {
 
-    private IAgentListener agentListener;
+    private IEventListener agentListener;
 
     @Override
-    public void init(IAgentListener agentListener) throws Exception {
+    public void init(IEventListener agentListener) throws Exception {
         this.agentListener = agentListener;
         getGraph().setAgent(this);
         getGraph().getStateGraph().compile();
     }
 
     @Override
-    public void invoke(IAgentRequest agentRequest) {
-        invoke(agentRequest, null);
-    }
-
-    @Override
-    public void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+    public void invoke(IAgentEvent agentEvent) {
         try {
-            agentListener.beforeInvoke(agentRequest, agentRuntimeContext);
-            getGraph().invoke(agentRequest, agentRuntimeContext);
-            agentListener.afterInvoke(agentRequest, agentRuntimeContext);
+            agentListener.beforeInvoke(this, agentEvent);
+
+            IAgentRuntimeContext runtimeContext = getAgentRuntimeContextBuilder().build(agentEvent);
+
+            getGraph().invoke(runtimeContext);
+
+            agentListener.afterInvoke(this, agentEvent, runtimeContext);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

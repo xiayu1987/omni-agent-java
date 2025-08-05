@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.agents.AgentBase;
 import com.beraising.agent.omni.core.agents.form.IFormAgent;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.graph.IGraph;
 import com.beraising.agent.omni.core.graph.form.IFormGraph;
@@ -12,11 +13,14 @@ import com.beraising.agent.omni.core.graph.form.IFormGraph;
 public class FormAgent extends AgentBase implements IFormAgent {
 
     private final IFormGraph formGraph;
+    private final IAgentRuntimeContextBuilder agentRuntimeContextBuilder;
     private final IAgentStaticContext agentStaticContext;
 
-    public FormAgent(IAgentStaticContext agentStaticContext, IFormGraph formGraph) {
+    public FormAgent(IFormGraph formGraph, IAgentStaticContext agentStaticContext,
+            IAgentRuntimeContextBuilder agentRuntimeContextBuilder) {
         this.formGraph = formGraph;
         this.agentStaticContext = agentStaticContext;
+        this.agentRuntimeContextBuilder = agentRuntimeContextBuilder;
     }
 
     @Override
@@ -37,6 +41,11 @@ public class FormAgent extends AgentBase implements IFormAgent {
     @Override
     public IAgentStaticContext getAgentStaticContext() {
         return this.agentStaticContext;
+    }
+
+    @Override
+    public IAgentRuntimeContextBuilder getAgentRuntimeContextBuilder() {
+        return this.agentRuntimeContextBuilder;
     }
 
 }

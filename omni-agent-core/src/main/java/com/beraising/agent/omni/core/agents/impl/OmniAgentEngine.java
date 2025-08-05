@@ -5,11 +5,9 @@ import org.springframework.stereotype.Component;
 import com.beraising.agent.omni.core.agents.AgentRegistry;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
-import com.beraising.agent.omni.core.agents.IAgentListener;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
-import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.impl.EventListener;
 import com.beraising.agent.omni.core.session.IAgentSession;
-import com.beraising.agent.omni.core.session.IAgentSessionItem;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 
 @Component
@@ -24,55 +22,25 @@ public class OmniAgentEngine implements IAgentEngine {
         this.agentSessionManage = agentSessionManage;
     }
 
-    public void invoke(IAgentRequest agentRequest) throws Exception {
-        IAgentSession agentSession = agentSessionManage.createAndAddAgentSession();
-        invoke(agentRequest, agentSession);
-    }
+    @Override
+    public void invoke(IAgentEvent agentEvent) throws Exception {
+        IAgentSession agentSession = agentEvent.getAgentSession();
+        IAgent currentAgent = null;
 
-    public void invoke(IAgentRequest agentRequest, IAgentSession agentSession) throws Exception {
-        IAgentSessionItem agentSessionItem = agentSessionManage.getCurrentSessionItem(agentSession);
-        IAgent currentAgent = agentSessionItem == null ? this.agentRegistry.getRouterAgent()
-                : agentSessionItem.getAgent();
-
-        currentAgent.init(new AgentListener(agentSession));
-        if (agentSessionItem == null) {
-            currentAgent.invoke(agentRequest);
+        if (agentSession == null) {
+            agentSession = agentSessionManage.createAndAddAgentSession();
+            currentAgent = this.agentRegistry.getRouterAgent();
         } else {
-            currentAgent.invoke(agentRequest, agentSessionItem.getAgentRuntimeContext());
+            currentAgent = agentSessionManage.getCurrentSessionItem(agentSession).getAgent();
         }
 
+        invoke(currentAgent, agentEvent);
     }
 
     @Override
-    public void invoke(IAgent agent, IAgentRequest agentRequest) throws Exception {
-        IAgentSession agentSession = agentSessionManage.createAndAddAgentSession();
-        invoke(agent, agentRequest, agentSession);
-    }
-
-    @Override
-    public void invoke(IAgent agent, IAgentRequest agentRequest, IAgentSession agentSession) throws Exception {
-        agent.init(new AgentListener(agentSession));
-        agent.invoke(agentRequest);
-    }
-
-    public class AgentListener implements IAgentListener {
-
-        private IAgentSession agentSession;
-
-        public AgentListener(IAgentSession agentSession) {
-            super();
-            this.agentSession = agentSession;
-        }
-
-        @Override
-        public void beforeInvoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext)
-                throws Exception {
-        }
-
-        @Override
-        public void afterInvoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) throws Exception {
-        }
-
+    public void invoke(IAgent agent, IAgentEvent agentEvent) throws Exception {
+        agent.init(new EventListener(agentEvent, agentSessionManage));
+        agent.invoke(agentEvent);
     }
 
 }

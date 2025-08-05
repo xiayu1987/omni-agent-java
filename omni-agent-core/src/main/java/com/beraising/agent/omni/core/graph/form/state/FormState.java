@@ -6,8 +6,8 @@ import java.util.Map;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.graph.GraphStateBase;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
@@ -27,9 +27,9 @@ public class FormState extends GraphStateBase {
     }
 
     @Override
-    public Map<String, Object> createInput(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+    public Map<String, Object> createInput(IAgentRuntimeContext agentRuntimeContext) {
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("user_query", "");
+        inputMap.put("user_query", agentRuntimeContext.getAgentEvent().getAgentRequest());
         return inputMap;
     }
 

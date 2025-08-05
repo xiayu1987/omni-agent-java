@@ -1,8 +1,8 @@
 package com.beraising.agent.omni.core.graph;
 
 import com.beraising.agent.omni.core.agents.IAgent;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentRequest;
 
 public abstract class GraphBase<T extends IGraphState> implements IGraph {
 
@@ -28,19 +28,19 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
     }
 
     @Override
-    public void invoke(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) throws Exception {
+    public void invoke(IAgentRuntimeContext agentRuntimeContext) throws Exception {
 
-        IGraphState graphState = buildGraphState(agentRequest, agentRuntimeContext);
+        IGraphState graphState = buildGraphState(agentRuntimeContext);
 
         this.setGraphState(graphState);
 
-        getStateGraph().compile().invoke(graphState.createInput(agentRequest, agentRuntimeContext));
+        getStateGraph().compile().invoke(graphState.createInput(agentRuntimeContext));
     }
 
-    protected IGraphState buildGraphState(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext)
+    protected IGraphState buildGraphState(IAgentRuntimeContext agentRuntimeContext)
             throws Exception {
 
-        return getGraphStateBuilder().build(agentRequest, agentRuntimeContext);
+        return getGraphStateBuilder().build(agentRuntimeContext);
     }
 
     public abstract IGraphStateBuilder<T> getGraphStateBuilder();

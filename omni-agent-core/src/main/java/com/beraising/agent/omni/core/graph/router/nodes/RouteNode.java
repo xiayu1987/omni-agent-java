@@ -16,7 +16,7 @@ public class RouteNode extends GraphNodeBase<RouterState> {
     @Override
     public IUpdatedGraphState<RouterState> apply(RouterState state) throws Exception {
 
-        String content = getChatClient().prompt(state.getUserQuery()).toolCallbacks(
+        String content = getChatClient().prompt().user(state.getUserQuery()).toolCallbacks(
 
                 getAgentStaticContext().getAgentRegistry().getAgentMap().entrySet().stream().map(entry -> {
                     return entry.getValue().asToolCallback();

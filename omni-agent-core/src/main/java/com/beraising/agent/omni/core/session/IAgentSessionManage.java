@@ -14,6 +14,8 @@ public interface IAgentSessionManage {
 
     IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);
 
+    void addSessionItem(IAgentSession agentSession, IAgentSessionItem sessionItem);
+
     void clearAllSessions();
 
 }

@@ -1,15 +1,11 @@
 package com.beraising.agent.omni.core.agents;
 
-import com.beraising.agent.omni.core.session.IAgentSession;
+import com.beraising.agent.omni.core.event.IAgentEvent;
 
 public interface IAgentEngine {
 
-    void invoke(IAgentRequest agentRequest) throws Exception;
+    void invoke(IAgentEvent agentEvent) throws Exception;
 
-    void invoke(IAgentRequest agentRequest, IAgentSession agentSession) throws Exception;
-
-    void invoke(IAgent agent, IAgentRequest agentRequest) throws Exception;
-
-    void invoke(IAgent agent, IAgentRequest agentRequest, IAgentSession agentSession) throws Exception;
+    void invoke(IAgent agent, IAgentEvent agentEvent) throws Exception;
 
 }

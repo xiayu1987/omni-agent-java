@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
-import com.beraising.agent.omni.core.agents.IAgentRequest;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.graph.GraphBase;
 import com.beraising.agent.omni.core.graph.IGraphStateBuilder;
 import com.beraising.agent.omni.core.graph.form.IFormGraph;
@@ -33,7 +33,7 @@ public class FormGraph extends GraphBase<FormState> implements IFormGraph {
         return new IGraphStateBuilder<FormState>() {
 
             @Override
-            public FormState build(IAgentRequest agentRequest, IAgentRuntimeContext agentRuntimeContext) {
+            public FormState build(IAgentRuntimeContext agentRuntimeContext) {
                 return new FormState();
             }
 
