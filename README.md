@@ -82,7 +82,7 @@ core/
 ```
 用户输入
    ↓
-[omni-agent-service] 封装为 IAgentRequest 并提交
+[omni-agent-service] 封装为 IAgentEvent 并提交
    ↓
 [OmniAgentEngine] 创建会话 → 路由到目标 Agent
    ↓
