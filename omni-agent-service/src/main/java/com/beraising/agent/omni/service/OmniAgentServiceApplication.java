@@ -38,7 +38,7 @@ public class OmniAgentServiceApplication {
 							AgentRequest.builder().requestType(EAgentRequestType.TEXT).text("我想明天请假")
 									.data(new HashMap<>()).build())
 					.agentResponse(null)
-					.agentSession(null).build());
+					.agentSessionID(null).build());
 
 			context.close();
 		};

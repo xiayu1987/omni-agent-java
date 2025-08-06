@@ -1,11 +1,11 @@
-package com.beraising.agent.omni.core.agents;
+package com.beraising.agent.omni.core.event;
 
+import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
-import com.beraising.agent.omni.core.event.IAgentEvent;
 
-public interface IAgentListener {
+public interface IEventListener {
 
-        void beforeInvoke(IAgent agent, IAgentEvent agentEvent)
+        void beforeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
                         throws Exception;
 
         void afterInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.beraising.agent.omni.core.common.ListUtils;
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.IAgentSessionItem;
@@ -42,14 +44,16 @@ public class AgentSessionManage implements IAgentSessionManage {
     @Override
     public IAgentSession createAndAddAgentSession() {
         IAgentSession agentSession = createAgentSession();
+        agentSession.setAgentSessionId(UUID.randomUUID().toString());
         agentSessions.add(agentSession);
         return agentSession;
     }
 
     @Override
     public IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession) {
-        return agentSession.getAgentSessionItems().stream()
-                .filter(item -> item.isCurrent()).findFirst().orElse(null);
+
+        return ListUtils.lastOf(agentSession.getAgentSessionItems());
+
     }
 
     @Override
@@ -60,6 +64,14 @@ public class AgentSessionManage implements IAgentSessionManage {
     @Override
     public void addSessionItem(IAgentSession agentSession, IAgentSessionItem sessionItem) {
         agentSession.getAgentSessionItems().add(sessionItem);
+    }
+
+    @Override
+    public void addAgentRuntimeContext(IAgentRuntimeContext runtimeContext) {
+        IAgentSession currentSession = getAgentSessionById(runtimeContext.getAgentSessionID());
+        if (currentSession != null) {
+            currentSession.getAgentRuntimeContexts().add(runtimeContext);
+        }
     }
 
 }

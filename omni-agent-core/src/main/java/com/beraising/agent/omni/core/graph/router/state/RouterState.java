@@ -2,10 +2,11 @@ package com.beraising.agent.omni.core.graph.router.state;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.alibaba.cloud.ai.graph.KeyStrategy;
-import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.GraphStateBase;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 
@@ -16,20 +17,24 @@ public class RouterState extends GraphStateBase {
     }
 
     @Override
-    public Map<String, Object> createInput(IAgentRuntimeContext agentRuntimeContext) {
-        Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("user_query", agentRuntimeContext.getAgentEvent().getAgentRequest());
-        return inputMap;
+    public void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent) {
+        input.put("user_input", agentEvent.getAgentRequest().getText());
     }
 
-    public String getUserQuery() {
-        return getState().value("user_query", "");
+    @Override
+    public void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent, int feedBackTimes) {
+
     }
 
-    public IUpdatedGraphState<RouterState> getUpdatedUserQuery(String value) {
+    public String getUserInput() {
+        return getState().value("user_input", "");
+    }
+
+    public IUpdatedGraphState<RouterState> getUpdatedUserInput(String value) {
         return () -> {
             Map<String, Object> result = new HashMap<>();
-            result.put("user_query", value);
+            result.put("user_input", value);
             return result;
         };
     }
@@ -46,16 +51,14 @@ public class RouterState extends GraphStateBase {
         };
     }
 
-    public static KeyStrategyFactory getKeyStrategyFactory() {
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+    public HashMap<String, KeyStrategy> getStateKeys() {
 
-            keyStrategyHashMap.put("user_query", new ReplaceStrategy());
-            keyStrategyHashMap.put("router_result", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
+        HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
 
-        return keyStrategyFactory;
+        keyStrategyHashMap.put("user_input", new ReplaceStrategy());
+        keyStrategyHashMap.put("router_result", new ReplaceStrategy());
+        return keyStrategyHashMap;
+
     }
 
 }

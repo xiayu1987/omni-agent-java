@@ -2,6 +2,7 @@ package com.beraising.agent.omni.core.event.impl;
 
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
@@ -28,13 +29,15 @@ public class EventListener implements IEventListener {
     }
 
     @Override
-    public void beforeInvoke(IAgent agent, IAgentEvent agentEvent) throws Exception {
-
+    public void beforeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+            throws Exception {
+        agentSessionManage.addAgentRuntimeContext(agentRuntimeContext);
     }
 
     @Override
     public void afterInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
             throws Exception {
-
+        agentEvent.setAgentResponse(null);
     }
+
 }

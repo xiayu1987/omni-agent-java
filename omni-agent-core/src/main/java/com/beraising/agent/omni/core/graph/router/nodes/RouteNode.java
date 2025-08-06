@@ -2,6 +2,8 @@ package com.beraising.agent.omni.core.graph.router.nodes;
 
 import java.util.stream.Collectors;
 
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.IGraph;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
@@ -14,17 +16,22 @@ public class RouteNode extends GraphNodeBase<RouterState> {
     }
 
     @Override
-    public IUpdatedGraphState<RouterState> apply(RouterState state) throws Exception {
+    public IUpdatedGraphState<RouterState> apply(RouterState graphState, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent) throws Exception {
+        String content = getChatClient().prompt().system("session_id:" + graphState.getAgentSessionID())
+                .user(graphState.getUserInput())
+                .toolCallbacks(
 
-        String content = getChatClient().prompt().user(state.getUserQuery()).toolCallbacks(
+                        getAgentStaticContext().getAgentRegistry().getAgentMap().entrySet().stream().map(entry -> {
+                            IAgentEvent agentEventCopy = agentEvent.copy();
+                            agentEventCopy.setAgentSessionID(null);
+                            agentEventCopy.setParentAgentSessionID(agentEvent.getAgentSessionID());
+                            return entry.getValue().asToolCallback(agentEventCopy);
+                        }).collect(Collectors.toList())
 
-                getAgentStaticContext().getAgentRegistry().getAgentMap().entrySet().stream().map(entry -> {
-                    return entry.getValue().asToolCallback();
-                }).collect(Collectors.toList())
+                ).call().content();
 
-        ).call().content();
-
-        return state.getUpdatedRouterResult(content);
+        return graphState.getUpdatedRouterResult(content);
     }
 
 }

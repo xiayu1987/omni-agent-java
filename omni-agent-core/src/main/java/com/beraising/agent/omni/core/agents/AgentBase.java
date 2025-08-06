@@ -6,7 +6,6 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IEventListener;
-import com.beraising.agent.omni.core.event.IAgentRequest;
 
 public abstract class AgentBase implements IAgent {
 
@@ -16,15 +15,15 @@ public abstract class AgentBase implements IAgent {
     public void init(IEventListener agentListener) throws Exception {
         this.agentListener = agentListener;
         getGraph().setAgent(this);
-        getGraph().getStateGraph().compile();
     }
 
     @Override
     public void invoke(IAgentEvent agentEvent) {
         try {
-            agentListener.beforeInvoke(this, agentEvent);
 
-            IAgentRuntimeContext runtimeContext = getAgentRuntimeContextBuilder().build(agentEvent);
+            IAgentRuntimeContext runtimeContext = getAgentRuntimeContextBuilder().build(this, agentEvent);
+
+            agentListener.beforeInvoke(this, agentEvent, runtimeContext);
 
             getGraph().invoke(runtimeContext);
 
@@ -36,13 +35,13 @@ public abstract class AgentBase implements IAgent {
     }
 
     @Override
-    public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback() {
+    public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent) {
         return FunctionToolCallback.builder(
                 getName(), new Function<AsToolRequest, AsToolResponse>() {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
                         try {
-                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, null);
+                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
                         } catch (Exception e) {
 
                             e.printStackTrace();

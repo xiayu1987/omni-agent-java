@@ -1,5 +1,9 @@
 package com.beraising.agent.omni.core.context;
 
+import java.util.List;
+
+import com.alibaba.cloud.ai.graph.CompiledGraph;
+import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.IGraphState;
 
@@ -9,8 +13,24 @@ public interface IAgentRuntimeContext extends IAgentContext {
 
     void setGraphState(IGraphState graphState);
 
-    IAgentEvent getAgentEvent();
+    List<IAgentEvent> getAgentEvents();
 
-    void setAgentEvent(IAgentEvent agentEvent);
+    void setAgentEvents(List<IAgentEvent> agentEvents);
+
+    IAgent getAgent();
+
+    void setAgent(IAgent agent);
+
+    CompiledGraph getCompiledGraph();
+
+    void setCompiledGraph(CompiledGraph compiledGraph);
+
+    String getAgentSessionID();
+
+    void setAgentSessionID(String agentSessionID);
+
+    boolean isEnd();
+
+    void setIsEnd(boolean isEnd);
 
 }

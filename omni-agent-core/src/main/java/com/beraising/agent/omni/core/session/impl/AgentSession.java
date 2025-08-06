@@ -3,17 +3,21 @@ package com.beraising.agent.omni.core.session.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionItem;
 
 public class AgentSession implements IAgentSession {
 
     private String agentSessionId;
+    private String parentAgentSessionId;
     private List<IAgentSessionItem> agentSessionItems;
+    private List<IAgentRuntimeContext> agentRuntimeContexts;
 
     public AgentSession() {
         super();
-        agentSessionItems = new ArrayList<>();
+        this.agentSessionItems = new ArrayList<>();
+        this.agentRuntimeContexts = new ArrayList<>();
     }
 
     @Override
@@ -26,6 +30,17 @@ public class AgentSession implements IAgentSession {
         this.agentSessionId = agentSessionId;
     }
 
+    @Override
+    public String getParentAgentSessionId() {
+        return parentAgentSessionId;
+    }
+
+    @Override
+    public void setParentAgentSessionId(String parentAgentSessionId) {
+        this.parentAgentSessionId = parentAgentSessionId;
+
+    }
+
     public List<IAgentSessionItem> getAgentSessionItems() {
         return agentSessionItems;
     }
@@ -34,5 +49,14 @@ public class AgentSession implements IAgentSession {
         this.agentSessionItems = agentSessionItems;
     }
 
+    @Override
+    public List<IAgentRuntimeContext> getAgentRuntimeContexts() {
+        return this.agentRuntimeContexts;
+    }
+
+    @Override
+    public void setAgentRuntimeContexts(List<IAgentRuntimeContext> agentRuntimeContexts) {
+        this.agentRuntimeContexts = agentRuntimeContexts;
+    }
 
 }

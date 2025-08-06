@@ -18,4 +18,6 @@ public interface IAgentRequest {
 
     void setData(Map<String, Object> data);
 
+    IAgentRequest copy();
+
 }

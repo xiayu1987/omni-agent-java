@@ -2,12 +2,10 @@ package com.beraising.agent.omni.core.graph;
 
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
-import com.beraising.agent.omni.core.event.IAgentRequest;
 
 public abstract class GraphBase<T extends IGraphState> implements IGraph {
 
     private IAgent agent;
-    private IGraphState graphState;
 
     @Override
     public void setAgent(IAgent agent) {
@@ -19,30 +17,23 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
         return agent;
     }
 
-    public IGraphState getGraphState() {
-        return graphState;
-    }
-
-    public void setGraphState(IGraphState graphState) {
-        this.graphState = graphState;
-    }
-
     @Override
     public void invoke(IAgentRuntimeContext agentRuntimeContext) throws Exception {
 
-        IGraphState graphState = buildGraphState(agentRuntimeContext);
+        if (agentRuntimeContext.getAgentEvents().size() == 0) {
+            throw new Exception("AgentRuntimeContext has no AgentEvent");
+        }
 
-        this.setGraphState(graphState);
+        if (agentRuntimeContext.getAgentEvents().size() == 1) {
+            agentRuntimeContext.getCompiledGraph()
+                    .invoke(agentRuntimeContext.getGraphState().createInput(agentRuntimeContext));
+        }
 
-        getStateGraph().compile().invoke(graphState.createInput(agentRuntimeContext));
+        if (agentRuntimeContext.getAgentEvents().size() > 1) {
+            agentRuntimeContext.getCompiledGraph()
+                    .invoke(agentRuntimeContext.getGraphState().createInput(agentRuntimeContext));
+        }
+
     }
-
-    protected IGraphState buildGraphState(IAgentRuntimeContext agentRuntimeContext)
-            throws Exception {
-
-        return getGraphStateBuilder().build(agentRuntimeContext);
-    }
-
-    public abstract IGraphStateBuilder<T> getGraphStateBuilder();
 
 }

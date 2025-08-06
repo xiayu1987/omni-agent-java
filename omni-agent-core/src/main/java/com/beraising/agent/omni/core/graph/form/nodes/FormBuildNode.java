@@ -1,5 +1,7 @@
 package com.beraising.agent.omni.core.graph.form.nodes;
 
+import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.IGraph;
 import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
@@ -12,8 +14,10 @@ public class FormBuildNode extends GraphNodeBase<FormState> {
     }
 
     @Override
-    public IUpdatedGraphState<FormState> apply(FormState state) throws Exception {
-        return null;
+    public IUpdatedGraphState<FormState> apply(FormState graphState, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'apply'");
     }
 
 }

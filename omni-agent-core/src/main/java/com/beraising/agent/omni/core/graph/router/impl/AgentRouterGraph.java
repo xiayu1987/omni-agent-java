@@ -5,9 +5,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
-import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.graph.GraphBase;
-import com.beraising.agent.omni.core.graph.IGraphStateBuilder;
+import com.beraising.agent.omni.core.graph.IGraphState;
 import com.beraising.agent.omni.core.graph.router.IAgentRouterGraph;
 import com.beraising.agent.omni.core.graph.router.nodes.RouteNode;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
@@ -17,10 +16,14 @@ public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRo
 
     private static final String ROUTER_NODE_NAME = "router_node";
 
-    @Override
-    public StateGraph getStateGraph() throws Exception {
+    public AgentRouterGraph() {
+        super();
+    }
 
-        StateGraph stateGraph = new StateGraph(getGraphStateBuilder().getKeyStrategyFactory())
+    @Override
+    public StateGraph getStateGraph(KeyStrategyFactory keyStrategyFactory) throws Exception {
+
+        StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode(ROUTER_NODE_NAME, AsyncNodeAction.node_async(new RouteNode(this)))
 
                 .addEdge(StateGraph.START, ROUTER_NODE_NAME)
@@ -30,20 +33,8 @@ public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRo
     }
 
     @Override
-    public IGraphStateBuilder<RouterState> getGraphStateBuilder() {
-        return new IGraphStateBuilder<RouterState>() {
-
-            @Override
-            public RouterState build(IAgentRuntimeContext agentRuntimeContext) {
-                return new RouterState();
-            }
-
-            @Override
-            public KeyStrategyFactory getKeyStrategyFactory() {
-                return RouterState.getKeyStrategyFactory();
-            }
-
-        };
+    public IGraphState newGraphState() {
+        return new RouterState();
     }
 
 }

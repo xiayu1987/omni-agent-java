@@ -26,7 +26,7 @@ public interface IAgent {
 
     void invoke(IAgentEvent agentEvent);
 
-    FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback();
+    FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
 
     @Data
     public class AsToolRequest {

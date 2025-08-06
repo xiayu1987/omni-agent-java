@@ -1,7 +1,5 @@
 package com.beraising.agent.omni.core.event;
 
-import com.beraising.agent.omni.core.session.IAgentSession;
-
 public interface IAgentEvent {
 
     IAgentRequest getAgentRequest();
@@ -12,8 +10,14 @@ public interface IAgentEvent {
 
     void setAgentResponse(IAgentResponse agentResponse);
 
-    public IAgentSession getAgentSession();
+    String getAgentSessionID();
 
-    public void setAgentSession(IAgentSession agentSession);
+    void setAgentSessionID(String agentSessionID);
+
+    String getParentAgentSessionID();
+
+    void setParentAgentSessionID(String parentAgentSessionID);
+
+    IAgentEvent copy();
 
 }
