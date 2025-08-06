@@ -2,7 +2,6 @@ package com.beraising.agent.omni.core.event.impl;
 
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
-import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;

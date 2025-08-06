@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.beraising.agent.omni.core.agents.AgentRegistry;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
-import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.impl.EventListener;
 import com.beraising.agent.omni.core.session.IAgentSession;
