@@ -28,15 +28,45 @@ public class EventListener implements IEventListener {
     }
 
     @Override
-    public void beforeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+    public void beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
             throws Exception {
+        // TODO Auto-generated method stub
         agentSessionManage.addAgentRuntimeContext(agentRuntimeContext);
     }
 
     @Override
-    public void afterInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+    public void afterAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
             throws Exception {
-        agentEvent.setAgentResponse(null);
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void beforeGraphInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+            throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void afterGraphInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+            throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void beforeGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+            throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void afterGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+            throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

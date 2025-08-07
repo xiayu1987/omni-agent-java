@@ -5,7 +5,7 @@ import java.util.List;
 import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.IGraphState;
+import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 public interface IAgentRuntimeContext extends IAgentContext {
 

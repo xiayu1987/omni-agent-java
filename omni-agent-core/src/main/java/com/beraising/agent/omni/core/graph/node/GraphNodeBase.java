@@ -1,4 +1,4 @@
-package com.beraising.agent.omni.core.graph;
+package com.beraising.agent.omni.core.graph.node;
 
 import java.util.Map;
 
@@ -10,6 +10,9 @@ import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.graph.IGraph;
+import com.beraising.agent.omni.core.graph.state.IGraphState;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 import com.beraising.agent.omni.core.session.IAgentSession;
 
 public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction, IGraphNode {
@@ -18,6 +21,7 @@ public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction
 
     public GraphNodeBase(IGraph graph) {
         this.graph = graph;
+        this.graph.getGraphNodes().add(this);
     }
 
     public IGraph getGraph() {

@@ -5,10 +5,22 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
 public interface IEventListener {
 
-        void beforeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+        void beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
                         throws Exception;
 
-        void afterInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+        void afterAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+                        throws Exception;
+
+        void beforeGraphInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+                        throws Exception;
+
+        void afterGraphInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+                        throws Exception;
+
+        void beforeGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
+                        throws Exception;
+
+        void afterGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
                         throws Exception;
 
         IAgentEvent getAgentEvent();

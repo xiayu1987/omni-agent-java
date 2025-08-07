@@ -14,7 +14,7 @@ import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.IGraphState;
+import com.beraising.agent.omni.core.graph.state.IGraphState;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 

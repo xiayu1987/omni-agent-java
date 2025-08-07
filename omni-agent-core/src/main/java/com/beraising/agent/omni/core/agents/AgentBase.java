@@ -9,25 +9,22 @@ import com.beraising.agent.omni.core.event.IEventListener;
 
 public abstract class AgentBase implements IAgent {
 
-    private IEventListener agentListener;
-
     @Override
-    public void init(IEventListener agentListener) throws Exception {
-        this.agentListener = agentListener;
+    public void init() throws Exception {
         getGraph().setAgent(this);
     }
 
     @Override
-    public void invoke(IAgentEvent agentEvent) {
+    public void invoke(IAgentEvent agentEvent, IEventListener eventListener) {
         try {
 
             IAgentRuntimeContext runtimeContext = getAgentRuntimeContextBuilder().build(this, agentEvent);
 
-            agentListener.beforeInvoke(this, agentEvent, runtimeContext);
+            eventListener.beforeAgentInvoke(this, agentEvent, runtimeContext);
 
-            getGraph().invoke(runtimeContext);
+            getGraph().invoke(runtimeContext, eventListener);
 
-            agentListener.afterInvoke(this, agentEvent, runtimeContext);
+            eventListener.afterAgentInvoke(this, agentEvent, runtimeContext);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +38,7 @@ public abstract class AgentBase implements IAgent {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
                         try {
-                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
+                            // getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
                         } catch (Exception e) {
 
                             e.printStackTrace();

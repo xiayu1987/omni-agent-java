@@ -8,4 +8,12 @@ public interface IAgentSessionItem {
 
     void setAgent(IAgent agent);
 
+    boolean isSubSession();
+
+    void setIsSubSession(boolean subSession);
+
+    String getSubAgentSessionId();
+
+    void setSubAgentSessionId(String subAgentSessionId);
+
 }

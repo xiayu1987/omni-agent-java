@@ -2,14 +2,17 @@ package com.beraising.agent.omni.core.graph.router.nodes;
 
 import java.util.stream.Collectors;
 
+import com.alibaba.cloud.ai.graph.RunnableConfig;
+import com.alibaba.cloud.ai.graph.state.StateSnapshot;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.IGraph;
-import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
+import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
+import com.beraising.agent.omni.core.graph.node.ISubGraphNode;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
-public class RouteNode extends GraphNodeBase<RouterState> {
+public class RouteNode extends GraphNodeBase<RouterState> implements ISubGraphNode {
 
     public RouteNode(IGraph graph) {
         super(graph);
@@ -31,6 +34,9 @@ public class RouteNode extends GraphNodeBase<RouterState> {
 
                 ).call().content();
 
+        // RunnableConfig runnableConfig = RunnableConfig.builder().threadId(agentRuntimeContext.getAgentSessionID())
+        //         .build();
+        // StateSnapshot stateSnapshot = agentRuntimeContext.getCompiledGraph().getState(runnableConfig);
         return graphState.getUpdatedRouterResult(content);
     }
 

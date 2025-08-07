@@ -1,4 +1,4 @@
-package com.beraising.agent.omni.core.graph;
+package com.beraising.agent.omni.core.graph.state;
 
 import java.util.HashMap;
 import java.util.Map;

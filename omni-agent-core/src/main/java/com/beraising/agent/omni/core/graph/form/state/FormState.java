@@ -7,9 +7,9 @@ import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.GraphStateBase;
-import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
+import com.beraising.agent.omni.core.graph.state.GraphStateBase;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public class FormState extends GraphStateBase {
 

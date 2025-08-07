@@ -22,9 +22,9 @@ public interface IAgent {
 
     IGraph getGraph();
 
-    void init(IEventListener agentListener) throws Exception;
+    void init() throws Exception;
 
-    void invoke(IAgentEvent agentEvent);
+    void invoke(IAgentEvent agentEvent, IEventListener eventListener) throws Exception;
 
     FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
 

@@ -41,10 +41,12 @@ public class AgentSession implements IAgentSession {
 
     }
 
+    @Override
     public List<IAgentSessionItem> getAgentSessionItems() {
         return agentSessionItems;
     }
 
+    @Override
     public void setAgentSessionItems(List<IAgentSessionItem> agentSessionItems) {
         this.agentSessionItems = agentSessionItems;
     }

@@ -2,10 +2,10 @@ package com.beraising.agent.omni.core.graph.form.nodes;
 
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.IGraph;
-import com.beraising.agent.omni.core.graph.IUpdatedGraphState;
 import com.beraising.agent.omni.core.graph.form.state.FormState;
+import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public class FormBuildNode extends GraphNodeBase<FormState> {
 

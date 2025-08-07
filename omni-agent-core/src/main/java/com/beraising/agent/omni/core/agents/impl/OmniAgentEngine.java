@@ -50,8 +50,8 @@ public class OmniAgentEngine implements IAgentEngine {
             agentEvent.setAgentSessionID(agentSession.getAgentSessionId());
         }
 
-        agent.init(new EventListener(agentEvent, agentSessionManage));
-        agent.invoke(agentEvent);
+        agent.init();
+        agent.invoke(agentEvent, new EventListener(agentEvent, agentSessionManage));
     }
 
 }
