@@ -2,13 +2,15 @@ package com.beraising.agent.omni.core.agents;
 
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
-import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IEventListener;
-import com.beraising.agent.omni.core.graph.IGraph;
+import com.beraising.agent.omni.core.graph.IAgentGraph;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public interface IAgent {
 
@@ -18,22 +20,26 @@ public interface IAgent {
 
     IAgentStaticContext getAgentStaticContext();
 
-    IAgentRuntimeContextBuilder getAgentRuntimeContextBuilder();
+    IAgentGraph getAgentGraph();
 
-    IGraph getGraph();
+    void init(IEventListener eventListener) throws Exception;
 
-    void init() throws Exception;
-
-    void invoke(IAgentEvent agentEvent, IEventListener eventListener) throws Exception;
+    IAgentEvent invoke(IAgentEvent agentEvent) throws Exception;
 
     FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
 
+    @Builder
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public class AsToolRequest {
         private String sessionID;
     }
 
+    @Builder
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public class AsToolResponse {
         private String sessionID;
     }

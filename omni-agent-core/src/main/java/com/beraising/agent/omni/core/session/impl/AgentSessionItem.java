@@ -7,7 +7,7 @@ public class AgentSessionItem implements IAgentSessionItem {
 
     private IAgent agent;
     private boolean subSession;
-    private String subAgentSessionId;
+    private String subSessionId;
 
     public IAgent getAgent() {
         return agent;
@@ -29,13 +29,13 @@ public class AgentSessionItem implements IAgentSessionItem {
     }
 
     @Override
-    public String getSubAgentSessionId() {
-        return subAgentSessionId;
+    public String getSubSessionId() {
+        return subSessionId;
     }
 
     @Override
-    public void setSubAgentSessionId(String subAgentSessionId) {
-        this.subAgentSessionId = subAgentSessionId;
+    public void setSubSessionId(String subSessionId) {
+        this.subSessionId = subSessionId;
     }
 
 }

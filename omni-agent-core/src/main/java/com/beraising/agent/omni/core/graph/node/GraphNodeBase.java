@@ -10,21 +10,21 @@ import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.graph.IGraph;
+import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 import com.beraising.agent.omni.core.session.IAgentSession;
 
 public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction, IGraphNode {
 
-    private IGraph graph;
+    private IAgentGraph graph;
 
-    public GraphNodeBase(IGraph graph) {
+    public GraphNodeBase(IAgentGraph graph) {
         this.graph = graph;
         this.graph.getGraphNodes().add(this);
     }
 
-    public IGraph getGraph() {
+    public IAgentGraph getGraph() {
         return graph;
     }
 

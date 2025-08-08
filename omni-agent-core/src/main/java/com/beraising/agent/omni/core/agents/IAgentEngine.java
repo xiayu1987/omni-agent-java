@@ -4,8 +4,8 @@ import com.beraising.agent.omni.core.event.IAgentEvent;
 
 public interface IAgentEngine {
 
-    void invoke(IAgentEvent agentEvent) throws Exception;
+    IAgentEvent invoke(IAgentEvent agentEvent) throws Exception;
 
-    void invoke(IAgent agent, IAgentEvent agentEvent) throws Exception;
+    IAgentEvent invoke(IAgent agent, IAgentEvent agentEvent) throws Exception;
 
 }

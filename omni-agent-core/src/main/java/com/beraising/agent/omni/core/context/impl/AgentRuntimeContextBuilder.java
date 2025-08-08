@@ -9,78 +9,54 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
-import com.beraising.agent.omni.core.agents.IAgent;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
-import com.beraising.agent.omni.core.session.IAgentSession;
-import com.beraising.agent.omni.core.session.IAgentSessionManage;
 
 @Component
 public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
 
-    private final IAgentSessionManage agentSessionManage;
-
-    public AgentRuntimeContextBuilder(IAgentSessionManage agentSessionManage) {
-        this.agentSessionManage = agentSessionManage;
+    public AgentRuntimeContextBuilder() {
     }
 
     @Override
-    public IAgentRuntimeContext build(IAgent agent, IAgentEvent agentEvent) throws Exception {
+    public IAgentRuntimeContext build(IAgentEvent agentEvent, IAgentGraph graph)
+            throws Exception {
         if (agentEvent == null) {
             throw new IllegalArgumentException("Agent event cannot be null");
         }
-
         if (agentEvent.getAgentSessionID() == null) {
             throw new IllegalArgumentException("Agent session ID cannot be null");
         }
-        IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
 
-        if (agentSession == null) {
-            throw new IllegalArgumentException("Agent session cannot be null");
-        }
+        IAgentRuntimeContext agentRuntimeContext = new AgentRuntimeContext();
+        agentRuntimeContext.setAgentSessionID(agentEvent.getAgentSessionID());
+        agentRuntimeContext.setAgent(graph.getAgent());
+        agentRuntimeContext.setIsEnd(false);
 
-        IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+        IGraphState graphState = graph.newGraphState();
+        agentRuntimeContext.setGraphState(graphState);
 
-        if (agentRuntimeContext == null || agentRuntimeContext.isEnd()) {
-            agentRuntimeContext = new AgentRuntimeContext();
-            agentRuntimeContext.setAgentSessionID(agentEvent.getAgentSessionID());
-            agentRuntimeContext.setAgent(agent);
+        HashMap<String, KeyStrategy> stateKeys = graphState.getStateKeys();
 
-        } else {
-            agentRuntimeContext.setIsEnd(false);
-        }
+        KeyStrategyFactory keyStrategyFactory = () -> {
 
-        IGraphState graphState = agentRuntimeContext.getGraphState();
-        CompiledGraph compiledGraph = agentRuntimeContext.getCompiledGraph();
+            HashMap<String, KeyStrategy> result = new HashMap<>();
+            result.putAll(IGraphState.getDefaultStateKeys());
+            result.putAll(stateKeys);
+            return result;
+        };
 
-        if (graphState == null) {
-            graphState = agent.getGraph().newGraphState();
-            agentRuntimeContext.setGraphState(graphState);
-        }
+        StateGraph stateGraph = graph.getStateGraph(keyStrategyFactory);
 
-        if (compiledGraph == null) {
-
-            HashMap<String, KeyStrategy> stateKeys = graphState.getStateKeys();
-
-            KeyStrategyFactory keyStrategyFactory = () -> {
-
-                HashMap<String, KeyStrategy> result = new HashMap<>();
-                result.putAll(IGraphState.getDefaultStateKeys());
-                result.putAll(stateKeys);
-                return result;
-            };
-
-            StateGraph stateGraph = agent.getGraph().getStateGraph(keyStrategyFactory);
-
-            compiledGraph = stateGraph
-                    .compile(CompileConfig.builder()
-                            .saverConfig(agent.getAgentStaticContext().getGraphSaverConfig())
-                            .build());
-            agentRuntimeContext.setCompiledGraph(compiledGraph);
-        }
+        CompiledGraph compiledGraph = stateGraph
+                .compile(CompileConfig.builder()
+                        .saverConfig(graph.getAgent().getAgentStaticContext().getGraphSaverConfig())
+                        .withLifecycleListener(graph.getAgentGraphListener().getStateGraphLifecycleListener())
+                        .build());
+        agentRuntimeContext.setCompiledGraph(compiledGraph);
 
         agentRuntimeContext.getAgentEvents().add(agentEvent);
 

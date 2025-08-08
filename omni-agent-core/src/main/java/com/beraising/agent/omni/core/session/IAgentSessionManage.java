@@ -12,9 +12,9 @@ public interface IAgentSessionManage {
 
     IAgentSession createAgentSession();
 
-    IAgentSession createAndAddAgentSession();
-
     IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);
+
+    void addSession(IAgentSession agentSession);
 
     void addSessionItem(IAgentSession agentSession, IAgentSessionItem sessionItem);
 

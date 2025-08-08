@@ -14,12 +14,14 @@ import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
-public abstract class GraphBase<T extends IGraphState> implements IGraph {
+public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGraph {
 
     private IAgent agent;
+    private IAgentGraphListener agentGraphListener;
     private List<IGraphNode> graphNodes;
+    private IEventListener eventListener;
 
-    public GraphBase() {
+    public AgentGraphBase() {
         super();
         graphNodes = new ArrayList<>();
     }
@@ -35,6 +37,26 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
     }
 
     @Override
+    public void setAgentGraphListener(IAgentGraphListener agentGraphListener) {
+        this.agentGraphListener = agentGraphListener;
+    }
+
+    @Override
+    public IAgentGraphListener getAgentGraphListener() {
+        return agentGraphListener;
+    }
+
+    @Override
+    public void setEventListener(IEventListener eventListener) {
+        this.eventListener = eventListener;
+    }
+
+    @Override
+    public IEventListener getEventListener() {
+        return eventListener;
+    }
+
+    @Override
     public void setGraphNodes(List<IGraphNode> graphNodes) {
         this.graphNodes = graphNodes;
     }
@@ -45,7 +67,16 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
     }
 
     @Override
-    public void invoke(IAgentRuntimeContext agentRuntimeContext, IEventListener eventListener) throws Exception {
+    public void init(IAgent agent, IEventListener eventListener, IAgentGraphListener agentGraphListener)
+            throws Exception {
+        this.agent = agent;
+        this.agentGraphListener = agentGraphListener;
+        this.eventListener = eventListener;
+
+    }
+
+    @Override
+    public IAgentEvent invoke(IAgentRuntimeContext agentRuntimeContext) throws Exception {
 
         if (agentRuntimeContext.getAgentEvents().size() == 0) {
             throw new Exception("AgentRuntimeContext has no AgentEvent");
@@ -54,16 +85,19 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
         RunnableConfig runnableConfig = RunnableConfig.builder().threadId(agentRuntimeContext.getAgentSessionID())
                 .build();
 
+        IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+
         if (agentRuntimeContext.getAgentEvents().size() == 1) {
-            IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+
             eventListener.beforeGraphInvoke(agent, agentEvent, agentRuntimeContext);
 
             agentRuntimeContext.getCompiledGraph()
                     .invoke(agentRuntimeContext.getGraphState().createInput(agentRuntimeContext), runnableConfig);
+
         }
 
         if (agentRuntimeContext.getAgentEvents().size() > 1) {
-            IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+
             eventListener.beforeGraphInvoke(agent, agentEvent, agentRuntimeContext);
 
             StateSnapshot stateSnapshot = agentRuntimeContext.getCompiledGraph().getState(runnableConfig);
@@ -72,7 +106,11 @@ public abstract class GraphBase<T extends IGraphState> implements IGraph {
 
             agentRuntimeContext.getCompiledGraph()
                     .invoke(agentRuntimeContext.getGraphState().createFeedBack(agentRuntimeContext), runnableConfig);
+
         }
+
+        return agentEvent;
+
     }
 
 }

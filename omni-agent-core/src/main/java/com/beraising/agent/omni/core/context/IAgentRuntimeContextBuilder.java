@@ -1,10 +1,10 @@
 package com.beraising.agent.omni.core.context;
 
-import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.graph.IAgentGraph;
 
 public interface IAgentRuntimeContextBuilder {
 
-    IAgentRuntimeContext build(IAgent agent, IAgentEvent agentEvent) throws Exception;
+    IAgentRuntimeContext build(IAgentEvent agentEvent, IAgentGraph graph) throws Exception;
 
 }

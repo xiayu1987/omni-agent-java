@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
-import com.beraising.agent.omni.core.graph.GraphBase;
+import com.beraising.agent.omni.core.graph.AgentGraphBase;
 import com.beraising.agent.omni.core.graph.router.IAgentRouterGraph;
 import com.beraising.agent.omni.core.graph.router.nodes.RouteNode;
 import com.beraising.agent.omni.core.graph.router.state.RouterState;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 @Component
-public class AgentRouterGraph extends GraphBase<RouterState> implements IAgentRouterGraph {
+public class AgentRouterGraph extends AgentGraphBase<RouterState> implements IAgentRouterGraph {
 
     private static final String ROUTER_NODE_NAME = "router_node";
 

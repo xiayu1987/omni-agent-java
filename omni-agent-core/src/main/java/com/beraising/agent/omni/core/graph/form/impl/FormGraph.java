@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
-import com.beraising.agent.omni.core.graph.GraphBase;
+import com.beraising.agent.omni.core.graph.AgentGraphBase;
 import com.beraising.agent.omni.core.graph.form.IFormGraph;
 import com.beraising.agent.omni.core.graph.form.nodes.FormBuildNode;
 import com.beraising.agent.omni.core.graph.form.state.FormState;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 @Component
-public class FormGraph extends GraphBase<FormState> implements IFormGraph {
+public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     private static final String FORM_NODE_NAME = "form_node";
 
     @Override

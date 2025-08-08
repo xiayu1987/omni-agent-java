@@ -42,14 +42,6 @@ public class AgentSessionManage implements IAgentSessionManage {
     }
 
     @Override
-    public IAgentSession createAndAddAgentSession() {
-        IAgentSession agentSession = createAgentSession();
-        agentSession.setAgentSessionId(UUID.randomUUID().toString());
-        agentSessions.add(agentSession);
-        return agentSession;
-    }
-
-    @Override
     public IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession) {
 
         return ListUtils.lastOf(agentSession.getAgentSessionItems());
@@ -72,6 +64,11 @@ public class AgentSessionManage implements IAgentSessionManage {
         if (currentSession != null) {
             currentSession.getAgentRuntimeContexts().add(runtimeContext);
         }
+    }
+
+    @Override
+    public void addSession(IAgentSession agentSession) {
+        agentSessions.add(agentSession);
     }
 
 }
