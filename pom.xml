@@ -59,6 +59,7 @@
 		<module>omni-agent-core</module>
 		<module>omni-agent-mcp</module>
 		<module>omni-agent-service</module>
+		<module>omni-agent-agents</module>
 	</modules>
 
 	<dependencyManagement>

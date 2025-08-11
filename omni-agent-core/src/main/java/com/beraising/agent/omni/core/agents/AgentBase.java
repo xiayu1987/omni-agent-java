@@ -36,8 +36,7 @@ public abstract class AgentBase implements IAgent {
             return agentGraph.invoke(runtimeContext);
 
         } catch (Exception e) {
-            // TODO
-            e.printStackTrace();
+            agentEvent.setAgentResponse(null);
         }
 
         return agentEvent;

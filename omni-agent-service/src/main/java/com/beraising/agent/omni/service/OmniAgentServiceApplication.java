@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 
-import com.beraising.agent.omni.core.agents.EAgentRequestType;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
+import com.beraising.agent.omni.core.event.EAgentRequestType;
 import com.beraising.agent.omni.core.event.impl.AgentEvent;
 import com.beraising.agent.omni.core.event.impl.AgentRequest;
 

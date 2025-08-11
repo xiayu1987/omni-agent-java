@@ -137,9 +137,8 @@ public class OmniAgentEngine implements IAgentEngine {
             if (agentRuntimeContext.getAgent().getName().equals(agent.getName())) {
                 agentRuntimeContext.setIsEnd(true);
                 IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+                agentEvent.setAgentResponse(null);
             }
         }
-
     }
-
 }

@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.beraising.agent.omni.core.agents.router.IRouterAgent;
-
 @Component
 public class AgentRegistry {
     private final Map<String, IAgent> agentMap = new ConcurrentHashMap<>();

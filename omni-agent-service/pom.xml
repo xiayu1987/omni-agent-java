@@ -14,6 +14,7 @@
 	<groupId>com.beraising.agent</groupId>
 	<artifactId>omni-agent-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
 	<name>omni-agent-service</name>
 	<description>omni-agent-service</description>
 	<url>http://www.beraising.com</url>
@@ -47,7 +48,7 @@
 
 		<dependency>
 			<groupId>com.beraising.agent</groupId>
-			<artifactId>omni-agent-core</artifactId>
+			<artifactId>omni-agent-agents</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 

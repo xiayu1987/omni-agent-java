@@ -2,7 +2,7 @@ package com.beraising.agent.omni.core.event.impl;
 
 import java.util.Map;
 
-import com.beraising.agent.omni.core.agents.EAgentRequestType;
+import com.beraising.agent.omni.core.event.EAgentRequestType;
 import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
