@@ -6,8 +6,10 @@ import com.beraising.agent.omni.core.event.IAgentResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,43 +19,6 @@ public class AgentEvent implements IAgentEvent {
     private IAgentResponse agentResponse;
     private String agentSessionID;
     private String parentAgentSessionID;
-
-    public IAgentRequest getAgentRequest() {
-        return agentRequest;
-    }
-
-    public void setAgentRequest(IAgentRequest agentRequest) {
-        this.agentRequest = agentRequest;
-    }
-
-    public IAgentResponse getAgentResponse() {
-        return agentResponse;
-    }
-
-    public void setAgentResponse(IAgentResponse agentResponse) {
-        this.agentResponse = agentResponse;
-    }
-
-    @Override
-    public String getAgentSessionID() {
-        return agentSessionID;
-    }
-
-    @Override
-    public void setAgentSessionID(String agentSessionID) {
-        this.agentSessionID = agentSessionID;
-    }
-
-    @Override
-    public String getParentAgentSessionID() {
-        return parentAgentSessionID;
-    }
-
-    @Override
-    public void setParentAgentSessionID(String parentAgentSessionID) {
-        this.parentAgentSessionID = parentAgentSessionID;
-
-    }
 
     @Override
     public IAgentEvent copy() {
