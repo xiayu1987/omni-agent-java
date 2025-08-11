@@ -1,7 +1,5 @@
 package com.beraising.agent.omni.service;
 
-import java.util.HashMap;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,8 +33,8 @@ public class OmniAgentServiceApplication {
 
 			omniAgentEngine.invoke(AgentEvent.builder()
 					.agentRequest(
-							AgentRequest.builder().requestType(EAgentRequestType.TEXT).text("我想明天请假")
-									.data(new HashMap<>()).build())
+							AgentRequest.builder().requestType(EAgentRequestType.TEXT).requestData("我想明天请假")
+									.build())
 					.agentResponse(null)
 					.agentSessionID(null).build());
 

@@ -1,11 +1,11 @@
 package com.beraising.agent.omni.core.event;
 
 public enum EAgentResponseType {
-
-    TEXT(0, "TEXT"),
-    FORM(1, "FORM"),
-    PICTURE(2, "PICTURE"),
-    MARKDOWN(3, "MARKDOWN");
+    ERROR(0, "ERROR"),
+    TEXT(1, "TEXT"),
+    FORM(2, "FORM"),
+    PICTURE(3, "PICTURE"),
+    MARKDOWN(4, "MARKDOWN");
 
     private final int code;
     private final String message;

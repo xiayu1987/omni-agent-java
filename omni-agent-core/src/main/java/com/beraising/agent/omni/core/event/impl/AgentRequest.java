@@ -1,30 +1,27 @@
 package com.beraising.agent.omni.core.event.impl;
 
-import java.util.Map;
-
 import com.beraising.agent.omni.core.event.EAgentRequestType;
 import com.beraising.agent.omni.core.event.IAgentRequest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AgentRequest implements IAgentRequest {
     private EAgentRequestType requestType;
-    private String text;
-    private Map<String, Object> data;
+    private String requestData;
 
     @Override
     public IAgentRequest copy() {
 
         return AgentRequest.builder()
                 .requestType(requestType)
-                .text(text)
-                .data(data != null ? new ObjectMapper().convertValue(data, new TypeReference<Map<String, Object>>() {
-                }) : null)
+                .requestData(requestData)
                 .build();
     }
 

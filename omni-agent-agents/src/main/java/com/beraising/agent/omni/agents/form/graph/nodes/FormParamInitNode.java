@@ -9,8 +9,8 @@ import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public class FormParamInitNode extends GraphNodeBase<FormState> {
 
-    public FormParamInitNode(IAgentGraph graph) {
-        super(graph);
+    public FormParamInitNode(String name, IAgentGraph graph) {
+        super(name, graph);
     }
 
     @Override

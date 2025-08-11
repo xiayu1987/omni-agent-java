@@ -8,8 +8,11 @@ import com.beraising.agent.omni.core.agents.IAgentEngine;
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
+import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
+import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionItem;
@@ -65,6 +68,19 @@ public class OmniAgentEngine implements IAgentEngine {
             super();
             this.agentSessionManage = agentSessionManage;
             this.agentRuntimeContextBuilder = agentRuntimeContextBuilder;
+        }
+
+        @Override
+        public void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                Throwable throwable) {
+            if (agentEvent != null) {
+                agentEvent.setAgentResponse(AgentResponse.builder().responseType(EAgentResponseType.ERROR)
+                        .responseData(throwable.getMessage()).build());
+            }
+
+            if (agentRuntimeContext != null) {
+                agentRuntimeContext.setIsEnd(true);
+            }
         }
 
         @Override
@@ -131,14 +147,15 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         @Override
-        public void onComplete(IAgent agent, IAgentSession agentSession)
+        public void onComplete(IAgent agent, IAgentSession agentSession, IAgentResponse agentResponse)
                 throws Exception {
             IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-            if (agentRuntimeContext.getAgent().getName().equals(agent.getName())) {
+            if (agentRuntimeContext.getAgent().getName().equals(agent.getName()) && !agentRuntimeContext.isEnd()) {
                 agentRuntimeContext.setIsEnd(true);
                 IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
-                agentEvent.setAgentResponse(null);
+                agentEvent.setAgentResponse(agentResponse);
             }
         }
+
     }
 }

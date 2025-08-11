@@ -11,8 +11,8 @@ import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public class RouteNode extends GraphNodeBase<RouterState> {
 
-    public RouteNode(IAgentGraph graph) {
-        super(graph);
+    public RouteNode(String name, IAgentGraph graph) {
+        super(name, graph);
     }
 
     @Override

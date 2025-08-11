@@ -1,20 +1,14 @@
 package com.beraising.agent.omni.core.event;
 
-import java.util.Map;
-
 public interface IAgentRequest {
 
     EAgentRequestType getRequestType();
 
     void setRequestType(EAgentRequestType requestType);
 
-    String getText();
+    String getRequestData();
 
-    void setText(String text);
-
-    Map<String, Object> getData();
-
-    void setData(Map<String, Object> data);
+    void setRequestData(String requestData);
 
     IAgentRequest copy();
 

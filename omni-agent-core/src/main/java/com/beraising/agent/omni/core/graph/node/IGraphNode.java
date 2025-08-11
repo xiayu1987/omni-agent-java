@@ -4,5 +4,7 @@ import com.beraising.agent.omni.core.graph.IAgentGraph;
 
 public interface IGraphNode {
 
+    String getName();
+
     IAgentGraph getGraph();
 }

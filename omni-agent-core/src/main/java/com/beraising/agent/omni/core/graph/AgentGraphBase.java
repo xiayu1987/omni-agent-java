@@ -2,6 +2,7 @@ package com.beraising.agent.omni.core.graph;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.RunnableConfig;
@@ -10,6 +11,7 @@ import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
@@ -92,7 +94,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             eventListener.beforeGraphInvoke(agent, agentEvent, agentRuntimeContext);
 
             agentRuntimeContext.getCompiledGraph()
-                    .invoke(agentRuntimeContext.getGraphState().createInput(agentRuntimeContext), runnableConfig);
+                    .invoke(createInput(agentRuntimeContext), runnableConfig);
 
         }
 
@@ -102,15 +104,58 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
 
             StateSnapshot stateSnapshot = agentRuntimeContext.getCompiledGraph().getState(runnableConfig);
             OverAllState state = stateSnapshot.state();
+            agentRuntimeContext.getGraphState().setState(state);
             state.withResume();
 
+            IGraphNode nextNode = this.getGraphNodes().stream()
+                    .filter(node -> node.getName().equals(runnableConfig.nextNode().orElse("")))
+                    .findFirst().orElse(null);
+
+            if (nextNode == null) {
+                throw new Exception("Next node not found");
+            }
+
             agentRuntimeContext.getCompiledGraph()
-                    .invoke(agentRuntimeContext.getGraphState().createFeedBack(agentRuntimeContext), runnableConfig);
+                    .invoke(createFeedBack(agentRuntimeContext, nextNode), runnableConfig);
 
         }
 
         return agentEvent;
 
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent) {
+        putInput(input, agentRuntimeContext, agentEvent, (T) agentRuntimeContext.getGraphState());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent, IGraphNode graphNode) {
+        putFeedBack(feedBack, agentRuntimeContext, agentEvent, graphNode, (T) agentRuntimeContext.getGraphState());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
+            IGraphNode graphNode) {
+
+        IAgentResponse agentResponse = createOutput(agentRuntimeContext, agentEvent, graphNode,
+                (T) agentRuntimeContext.getGraphState());
+
+        return agentResponse;
+    }
+
+    public abstract void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent, T graphState);
+
+    public abstract void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent, IGraphNode graphNode, T graphState);
+
+    public abstract IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
+            IGraphNode graphNode, T graphState);
 
 }

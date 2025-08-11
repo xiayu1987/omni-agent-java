@@ -6,6 +6,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 
 import com.alibaba.cloud.ai.graph.GraphLifecycleListener;
 import com.alibaba.cloud.ai.graph.StateGraph;
+import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IEventListener;
@@ -26,17 +27,21 @@ public abstract class AgentBase implements IAgent {
 
     @Override
     public IAgentEvent invoke(IAgentEvent agentEvent) {
+
+        IAgentRuntimeContext runtimeContext = null;
+
         try {
 
             IAgentGraph agentGraph = getAgentGraph();
 
-            IAgentRuntimeContext runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
+            runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
                     getAgentGraph());
 
             return agentGraph.invoke(runtimeContext);
 
         } catch (Exception e) {
-            agentEvent.setAgentResponse(null);
+            e.printStackTrace();
+            this.eventListener.onError(this, agentEvent, runtimeContext, e);
         }
 
         return agentEvent;
@@ -87,14 +92,27 @@ public abstract class AgentBase implements IAgent {
         @Override
         public void onComplete(String nodeId, Map<String, Object> state) {
             if (nodeId.equals(StateGraph.END)) {
+                IAgentEvent agentEvent = null;
+                IAgentRuntimeContext runtimeContext = null;
+
                 try {
                     IAgentSession agentSession = AgentBase.this.getAgentStaticContext().getAgentSessionManage()
                             .getAgentSessionById(state.get(IGraphState.getAgentSessionIDKey()).toString());
 
-                    AgentBase.this.eventListener.onComplete(AgentBase.this, agentSession);
+                    runtimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+                    if (runtimeContext.getAgent().getName().equals(AgentBase.this.getName())) {
+
+                        agentEvent = ListUtils.lastOf(runtimeContext.getAgentEvents());
+
+                        AgentBase.this.eventListener.onComplete(AgentBase.this, agentSession,
+                                AgentBase.this.getAgentGraph().createOutput(runtimeContext,
+                                        agentEvent, null));
+                    }
+
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
+
                     e.printStackTrace();
+                    AgentBase.this.eventListener.onError(AgentBase.this, agentEvent, runtimeContext, e);
                 }
             }
         }

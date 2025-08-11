@@ -18,8 +18,10 @@ import com.beraising.agent.omni.core.session.IAgentSession;
 public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction, IGraphNode {
 
     private IAgentGraph graph;
+    private String name;
 
-    public GraphNodeBase(IAgentGraph graph) {
+    public GraphNodeBase(String name, IAgentGraph graph) {
+        this.name = name;
         this.graph = graph;
         this.graph.getGraphNodes().add(this);
     }
@@ -85,6 +87,11 @@ public abstract class GraphNodeBase<T extends IGraphState> implements NodeAction
         IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
 
         return new StateInfo((T) graphState, agentRuntimeContext, agentEvent);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     private class StateInfo {

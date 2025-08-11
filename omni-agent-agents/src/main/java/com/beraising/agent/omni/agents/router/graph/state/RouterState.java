@@ -16,15 +16,8 @@ public class RouterState extends GraphStateBase {
         super();
     }
 
-    @Override
-    public void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent) {
-        input.put("user_input", agentEvent.getAgentRequest().getText());
-    }
-
-    @Override
-    public void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
-            IAgentEvent agentEvent, int feedBackTimes) {
-
+    public void putUserInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent) {
+        input.put("user_input", agentEvent.getAgentRequest().getRequestData());
     }
 
     public String getUserInput() {

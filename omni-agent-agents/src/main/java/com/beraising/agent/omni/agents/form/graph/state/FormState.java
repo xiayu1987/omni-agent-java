@@ -17,24 +17,17 @@ public class FormState extends GraphStateBase {
         super();
     }
 
-    @Override
-    public void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent) {
-        input.put("user_input", agentEvent.getAgentRequest().getText());
+    public void putUserInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext,
+            IAgentEvent agentEvent) {
+        input.put("user_input", agentEvent.getAgentRequest().getRequestData());
     }
-
-    @Override
-    public void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
-            IAgentEvent agentEvent, int feedBackTimes) {
-
-    }
-
 
     public String getUserInput() {
         return getState().value("user_input", "");
     }
 
-    public String getRouterResult() {
-        return getState().value("router_result", "");
+    public String getFormInfo() {
+        return getState().value("form_info", "");
     }
 
     public IUpdatedGraphState<RouterState> getUpdatedUserInput(String value) {

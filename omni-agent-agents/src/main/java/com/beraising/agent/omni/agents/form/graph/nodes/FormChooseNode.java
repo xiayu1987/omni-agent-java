@@ -9,8 +9,8 @@ import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public class FormChooseNode extends GraphNodeBase<FormState> {
 
-    public FormChooseNode(IAgentGraph graph) {
-        super(graph);
+    public FormChooseNode(String name, IAgentGraph graph) {
+        super(name, graph);
     }
 
     @Override

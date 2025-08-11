@@ -10,6 +10,9 @@ public interface IEventListener {
         IAgentSession onStart(IAgent agent, IAgentEvent agentEvent)
                         throws Exception;
 
+        void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                        Throwable throwable);
+
         IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph)
                         throws Exception;
 
@@ -22,7 +25,7 @@ public interface IEventListener {
         void afterGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
                         throws Exception;
 
-        void onComplete(IAgent agent, IAgentSession agentSession)
+        void onComplete(IAgent agent, IAgentSession agentSession, IAgentResponse agentResponse)
                         throws Exception;
 
 }
