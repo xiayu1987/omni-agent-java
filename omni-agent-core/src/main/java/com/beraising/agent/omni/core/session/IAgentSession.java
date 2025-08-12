@@ -10,10 +10,6 @@ public interface IAgentSession {
 
     void setAgentSessionId(String agentSessionId);
 
-    String getParentAgentSessionId();
-
-    void setParentAgentSessionId(String parentAgentSessionId);
-
     List<IAgentSessionItem> getAgentSessionItems();
 
     void setAgentSessionItems(List<IAgentSessionItem> agentSessionItems);

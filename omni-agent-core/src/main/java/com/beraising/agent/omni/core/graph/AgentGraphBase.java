@@ -91,16 +91,12 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
 
         if (agentRuntimeContext.getAgentEvents().size() == 1) {
 
-            eventListener.beforeGraphInvoke(agent, agentEvent, agentRuntimeContext);
-
             agentRuntimeContext.getCompiledGraph()
-                    .invoke(createInput(agentRuntimeContext), runnableConfig);
+                    .invoke(createInput(agentEvent, agentRuntimeContext), runnableConfig);
 
         }
 
         if (agentRuntimeContext.getAgentEvents().size() > 1) {
-
-            eventListener.beforeGraphInvoke(agent, agentEvent, agentRuntimeContext);
 
             StateSnapshot stateSnapshot = agentRuntimeContext.getCompiledGraph().getState(runnableConfig);
             OverAllState state = stateSnapshot.state();
@@ -116,7 +112,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             }
 
             agentRuntimeContext.getCompiledGraph()
-                    .invoke(createFeedBack(agentRuntimeContext, nextNode), runnableConfig);
+                    .invoke(createFeedBack(agentEvent, agentRuntimeContext, nextNode), runnableConfig);
 
         }
 

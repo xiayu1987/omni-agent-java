@@ -174,4 +174,4 @@ cd omni-agent/omni-agent-service
 
 ## 📄 License
 
-MIT © YourCompany
+MIT © beraising.com

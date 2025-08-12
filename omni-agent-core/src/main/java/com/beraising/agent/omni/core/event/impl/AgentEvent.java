@@ -18,7 +18,6 @@ public class AgentEvent implements IAgentEvent {
     private IAgentRequest agentRequest;
     private IAgentResponse agentResponse;
     private String agentSessionID;
-    private String parentAgentSessionID;
 
     @Override
     public IAgentEvent copy() {
@@ -26,7 +25,6 @@ public class AgentEvent implements IAgentEvent {
         copy.setAgentRequest(agentRequest != null ? agentRequest.copy() : null);
         copy.setAgentResponse(agentResponse != null ? agentResponse.copy() : null);
         copy.setAgentSessionID(agentSessionID);
-        copy.setParentAgentSessionID(parentAgentSessionID);
         return copy;
     }
 

@@ -10,7 +10,6 @@ import com.beraising.agent.omni.core.session.IAgentSessionItem;
 public class AgentSession implements IAgentSession {
 
     private String agentSessionId;
-    private String parentAgentSessionId;
     private List<IAgentSessionItem> agentSessionItems;
     private List<IAgentRuntimeContext> agentRuntimeContexts;
 
@@ -28,17 +27,6 @@ public class AgentSession implements IAgentSession {
     @Override
     public void setAgentSessionId(String agentSessionId) {
         this.agentSessionId = agentSessionId;
-    }
-
-    @Override
-    public String getParentAgentSessionId() {
-        return parentAgentSessionId;
-    }
-
-    @Override
-    public void setParentAgentSessionId(String parentAgentSessionId) {
-        this.parentAgentSessionId = parentAgentSessionId;
-
     }
 
     @Override

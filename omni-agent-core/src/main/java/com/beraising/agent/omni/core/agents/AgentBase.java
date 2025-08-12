@@ -9,11 +9,12 @@ import com.alibaba.cloud.ai.graph.StateGraph;
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.IAgentGraphListener;
+import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
-import com.beraising.agent.omni.core.session.IAgentSession;
 
 public abstract class AgentBase implements IAgent {
 
@@ -54,6 +55,14 @@ public abstract class AgentBase implements IAgent {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
                         try {
+
+                            // getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
+                            // AgentEvent.builder().agentRequest(agentEvent.getAgentRequest())
+                            // .agentResponse(agentEvent.getAgentResponse())
+                            // .agentSessionID(agentEvent.getAgentSessionID())
+                            // .eventSource(EEventSource.SYSTEM)
+                            // .build());
+
                             getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
                         } catch (Exception e) {
                             return new AsToolResponse("表单未处理成功: " + e.getMessage());
@@ -85,6 +94,14 @@ public abstract class AgentBase implements IAgent {
             this.stateGraphLifecycleListener = stateGraphLifecycleListener;
         }
 
+        @Override
+        public void onInterrupt(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                IGraphNode graphNode, IAgentResponse agentResponse) throws Exception {
+            AgentBase.this.eventListener.onInterrupt(AgentBase.this, agentEvent, agentRuntimeContext,
+                    AgentBase.this.getAgentGraph().createOutput(agentRuntimeContext,
+                            agentEvent, graphNode));
+        }
+
     }
 
     public class AgentGraphLifecycleListener implements GraphLifecycleListener {
@@ -96,18 +113,16 @@ public abstract class AgentBase implements IAgent {
                 IAgentRuntimeContext runtimeContext = null;
 
                 try {
-                    IAgentSession agentSession = AgentBase.this.getAgentStaticContext().getAgentSessionManage()
-                            .getAgentSessionById(state.get(IGraphState.getAgentSessionIDKey()).toString());
+                    IAgentRuntimeContext agentRuntimeContext = AgentBase.this.getAgentStaticContext()
+                            .getAgentSessionManage()
+                            .getAgentRuntimeContextById(
+                                    state.get(IGraphState.getAgentRuntimeContextIDKey()).toString());
 
-                    runtimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-                    if (runtimeContext.getAgent().getName().equals(AgentBase.this.getName())) {
+                    agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
 
-                        agentEvent = ListUtils.lastOf(runtimeContext.getAgentEvents());
-
-                        AgentBase.this.eventListener.onComplete(AgentBase.this, agentSession,
-                                AgentBase.this.getAgentGraph().createOutput(runtimeContext,
-                                        agentEvent, null));
-                    }
+                    AgentBase.this.eventListener.onComplete(AgentBase.this, agentEvent, agentRuntimeContext,
+                            AgentBase.this.getAgentGraph().createOutput(agentRuntimeContext,
+                                    agentEvent, null));
 
                 } catch (Exception e) {
 
@@ -116,7 +131,5 @@ public abstract class AgentBase implements IAgent {
                 }
             }
         }
-
     }
-
 }

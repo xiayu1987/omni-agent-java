@@ -10,6 +10,8 @@ public interface IAgentSessionManage {
 
     IAgentSession getAgentSessionById(String sessionId);
 
+    IAgentRuntimeContext getAgentRuntimeContextById(String runtimeContextId);
+
     IAgentSession createAgentSession();
 
     IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);

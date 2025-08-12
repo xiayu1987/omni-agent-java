@@ -16,6 +16,7 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     private IAgent agent;
     private CompiledGraph compiledGraph;
     private String agentSessionID;
+    private String agentRuntimeContextID;
 
     private boolean isEnd;
 
@@ -81,6 +82,16 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     @Override
     public void setAgentSessionID(String agentSessionID) {
         this.agentSessionID = agentSessionID;
+    }
+
+    @Override
+    public String getAgentRuntimeContextID() {
+        return agentRuntimeContextID;
+    }
+
+    @Override
+    public void setAgentRuntimeContextID(String agentRuntimeContextID) {
+        this.agentRuntimeContextID = agentRuntimeContextID;
     }
 
 }

@@ -71,4 +71,16 @@ public class AgentSessionManage implements IAgentSessionManage {
         agentSessions.add(agentSession);
     }
 
+    @Override
+    public IAgentRuntimeContext getAgentRuntimeContextById(String runtimeContextId) {
+        for (IAgentSession session : agentSessions) {
+            for (IAgentRuntimeContext context : session.getAgentRuntimeContexts()) {
+                if (context.getAgentRuntimeContextID().equals(runtimeContextId)) {
+                    return context;
+                }
+            }
+        }
+        return null;
+    }
+
 }

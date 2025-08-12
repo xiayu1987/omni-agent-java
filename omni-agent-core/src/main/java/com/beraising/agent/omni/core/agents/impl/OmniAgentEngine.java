@@ -15,9 +15,9 @@ import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.session.IAgentSession;
-import com.beraising.agent.omni.core.session.IAgentSessionItem;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.impl.AgentSessionItem;
+import com.google.gson.Gson;
 
 @Component
 public class OmniAgentEngine implements IAgentEngine {
@@ -44,7 +44,9 @@ public class OmniAgentEngine implements IAgentEngine {
 
             currentAgent = this.agentRegistry.getRouterAgent();
         } else {
-            currentAgent = agentSessionManage.getCurrentSessionItem(agentSession).getAgent();
+            String currentAgentName = agentSessionManage.getCurrentSessionItem(agentSession).getAgentName();
+
+            currentAgent = this.agentRegistry.getAgentByName(currentAgentName);
         }
 
         return invoke(currentAgent, agentEvent);
@@ -56,7 +58,13 @@ public class OmniAgentEngine implements IAgentEngine {
         eventListener.onStart(agent, agentEvent);
 
         agent.init(eventListener);
-        return agent.invoke(agentEvent);
+        IAgentEvent result = agent.invoke(agentEvent);
+
+        IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
+
+        System.out.println("Agent Session Items: " + new Gson().toJson(agentSession.getAgentSessionItems()));
+
+        return result;
     }
 
     public class EventListener implements IEventListener {
@@ -74,8 +82,25 @@ public class OmniAgentEngine implements IAgentEngine {
         public void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                 Throwable throwable) {
             if (agentEvent != null) {
-                agentEvent.setAgentResponse(AgentResponse.builder().responseType(EAgentResponseType.ERROR)
-                        .responseData(throwable.getMessage()).build());
+
+                IAgentResponse agentResponse = AgentResponse.builder().responseType(EAgentResponseType.ERROR)
+                        .responseData(throwable.getMessage()).build();
+
+                agentEvent.setAgentResponse(agentResponse);
+
+                IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
+
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(agentEvent.getAgentRequest())
+                        .agentResponse(null)
+                        .build());
+
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(null)
+                        .agentResponse(agentResponse)
+                        .build());
             }
 
             if (agentRuntimeContext != null) {
@@ -90,16 +115,16 @@ public class OmniAgentEngine implements IAgentEngine {
 
             if (agentSession == null) {
                 agentSession = agentSessionManage.createAgentSession();
-                agentSession.setParentAgentSessionId(agentEvent.getParentAgentSessionID());
                 agentSessionManage.addSession(agentSession);
             }
 
-            IAgentSessionItem agentSessionItem = new AgentSessionItem();
-            agentSessionItem.setAgent(agent);
-            agentSession.getAgentSessionItems().add(agentSessionItem);
+            // agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+            // .agent(agent)
+            // .agentRequest(agentEvent.getAgentRequest())
+            // .agentResponse(null)
+            // .build());
 
             agentEvent.setAgentSessionID(agentSession.getAgentSessionId());
-            agentEvent.setParentAgentSessionID(agentSession.getParentAgentSessionId());
 
             return agentSession;
 
@@ -113,7 +138,8 @@ public class OmniAgentEngine implements IAgentEngine {
             IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
 
             if (agentRuntimeContext == null || agentRuntimeContext.isEnd()
-                    || !agent.getName().equals(agentRuntimeContext.getAgent().getName())) {
+                    || !agent.getName().equals(agentRuntimeContext.getAgent().getName())
+                    || agentRuntimeContext.getCompiledGraph() == null) {
                 agentRuntimeContext = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
                 agentSessionManage.addAgentRuntimeContext(agentRuntimeContext);
 
@@ -126,36 +152,60 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         @Override
-        public void beforeGraphInvoke(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext)
-                throws Exception {
-            // TODO Auto-generated method stub
+        public void onComplete(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                IAgentResponse agentResponse) throws Exception {
+            if (agentRuntimeContext.isEnd()) {
+                return;
+            }
 
-        }
+            IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
+            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            if (lastAgentRuntimeContext.getAgentRuntimeContextID()
+                    .equals(agentRuntimeContext.getAgentRuntimeContextID()) && !lastAgentRuntimeContext.isEnd()) {
+                lastAgentRuntimeContext.setIsEnd(true);
+                IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
+                lastAgentEvent.setAgentResponse(agentResponse);
 
-        @Override
-        public void beforeGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent,
-                IAgentRuntimeContext agentRuntimeContext) throws Exception {
-            // TODO Auto-generated method stub
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(agentEvent.getAgentRequest())
+                        .agentResponse(null)
+                        .build());
 
-        }
-
-        @Override
-        public void afterGraphNodeInvoke(IAgent agent, IAgentEvent agentEvent,
-                IAgentRuntimeContext agentRuntimeContext) throws Exception {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onComplete(IAgent agent, IAgentSession agentSession, IAgentResponse agentResponse)
-                throws Exception {
-            IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-            if (agentRuntimeContext.getAgent().getName().equals(agent.getName()) && !agentRuntimeContext.isEnd()) {
-                agentRuntimeContext.setIsEnd(true);
-                IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
-                agentEvent.setAgentResponse(agentResponse);
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(null)
+                        .agentResponse(agentResponse)
+                        .build());
             }
         }
 
+        @Override
+        public void onInterrupt(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                IAgentResponse agentResponse) throws Exception {
+            if (agentRuntimeContext.isEnd()) {
+                return;
+            }
+
+            IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
+            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            if (lastAgentRuntimeContext.getAgentRuntimeContextID()
+                    .equals(agentRuntimeContext.getAgentRuntimeContextID()) && !lastAgentRuntimeContext.isEnd()) {
+                IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
+                lastAgentEvent.setAgentResponse(agentResponse);
+
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(agentEvent.getAgentRequest())
+                        .agentResponse(null)
+                        .build());
+
+                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                        .agentName(agent.getName())
+                        .agentRequest(null)
+                        .agentResponse(agentResponse)
+                        .build());
+            }
+        }
     }
 }

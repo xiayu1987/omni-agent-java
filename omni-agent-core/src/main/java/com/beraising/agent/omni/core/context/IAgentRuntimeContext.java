@@ -9,6 +9,10 @@ import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 public interface IAgentRuntimeContext extends IAgentContext {
 
+    String getAgentRuntimeContextID();
+
+    void setAgentRuntimeContextID(String agentRuntimeContextID);
+
     IGraphState getGraphState();
 
     void setGraphState(IGraphState graphState);

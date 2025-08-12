@@ -14,10 +14,6 @@ public interface IAgentEvent {
 
     void setAgentSessionID(String agentSessionID);
 
-    String getParentAgentSessionID();
-
-    void setParentAgentSessionID(String parentAgentSessionID);
-
     IAgentEvent copy();
 
 }

@@ -7,7 +7,6 @@ import java.util.Map;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
@@ -17,51 +16,54 @@ import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 public interface IAgentGraph {
 
-    void init(IAgent agent, IEventListener eventListener,
-            IAgentGraphListener agentGraphListener) throws Exception;
+        void init(IAgent agent, IEventListener eventListener,
+                        IAgentGraphListener agentGraphListener) throws Exception;
 
-    IAgentEvent invoke(IAgentRuntimeContext agentRuntimeContext) throws Exception;
+        IAgentEvent invoke(IAgentRuntimeContext agentRuntimeContext) throws Exception;
 
-    StateGraph getStateGraph(KeyStrategyFactory keyStrategyFactory) throws Exception;
+        StateGraph getStateGraph(KeyStrategyFactory keyStrategyFactory) throws Exception;
 
-    void setAgent(IAgent agent);
+        void setAgent(IAgent agent);
 
-    IAgent getAgent();
+        IAgent getAgent();
 
-    void setAgentGraphListener(IAgentGraphListener agentGraphListener);
+        void setAgentGraphListener(IAgentGraphListener agentGraphListener);
 
-    IAgentGraphListener getAgentGraphListener();
+        IAgentGraphListener getAgentGraphListener();
 
-    void setEventListener(IEventListener eventListener);
+        void setEventListener(IEventListener eventListener);
 
-    IEventListener getEventListener();
+        IEventListener getEventListener();
 
-    void setGraphNodes(List<IGraphNode> graphNodes);
+        void setGraphNodes(List<IGraphNode> graphNodes);
 
-    List<IGraphNode> getGraphNodes();
+        List<IGraphNode> getGraphNodes();
 
-    IGraphState newGraphState();
+        IGraphState newGraphState();
 
-    default Map<String, Object> createInput(IAgentRuntimeContext agentRuntimeContext) {
-        Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put(IGraphState.getAgentSessionIDKey(), agentRuntimeContext.getAgentSessionID());
-        putInput(inputMap, agentRuntimeContext, ListUtils.lastOf(agentRuntimeContext.getAgentEvents()));
-        return inputMap;
-    }
+        default Map<String, Object> createInput(IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext) {
+                Map<String, Object> inputMap = new HashMap<>();
+                inputMap.put(IGraphState.getAgentSessionIDKey(), agentRuntimeContext.getAgentSessionID());
+                inputMap.put(IGraphState.getAgentRuntimeContextIDKey(), agentRuntimeContext.getAgentRuntimeContextID());
+                putInput(inputMap, agentRuntimeContext, agentEvent);
+                return inputMap;
+        }
 
-    default Map<String, Object> createFeedBack(IAgentRuntimeContext agentRuntimeContext, IGraphNode graphNode) {
-        Map<String, Object> inputMap = new HashMap<>();
-        putFeedBack(inputMap, agentRuntimeContext, ListUtils.lastOf(agentRuntimeContext.getAgentEvents()), graphNode);
-        return inputMap;
-    }
+        default Map<String, Object> createFeedBack(IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                        IGraphNode graphNode) {
+                Map<String, Object> inputMap = new HashMap<>();
+                putFeedBack(inputMap, agentRuntimeContext, agentEvent, graphNode);
 
-    IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
-            IGraphNode graphNode);
+                return inputMap;
+        }
 
-    void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext,
-            IAgentEvent agentEvent);
+        IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
+                        IGraphNode graphNode);
 
-    void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
-            IAgentEvent agentEvent, IGraphNode graphNode);
+        void putInput(Map<String, Object> input, IAgentRuntimeContext agentRuntimeContext,
+                        IAgentEvent agentEvent);
+
+        void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
+                        IAgentEvent agentEvent, IGraphNode graphNode);
 
 }

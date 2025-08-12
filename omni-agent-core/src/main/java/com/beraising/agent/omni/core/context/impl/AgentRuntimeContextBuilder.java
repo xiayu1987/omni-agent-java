@@ -1,6 +1,7 @@
 package com.beraising.agent.omni.core.context.impl;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
+import com.beraising.agent.omni.core.graph.node.IInterruptNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 @Component
@@ -32,6 +34,7 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
         }
 
         IAgentRuntimeContext agentRuntimeContext = new AgentRuntimeContext();
+        agentRuntimeContext.setAgentRuntimeContextID(UUID.randomUUID().toString());
         agentRuntimeContext.setAgentSessionID(agentEvent.getAgentSessionID());
         agentRuntimeContext.setAgent(graph.getAgent());
         agentRuntimeContext.setIsEnd(false);
@@ -51,10 +54,16 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
 
         StateGraph stateGraph = graph.getStateGraph(keyStrategyFactory);
 
+        String[] interruptNodes = graph.getGraphNodes().stream()
+                .filter(node -> node instanceof IInterruptNode)
+                .map(node -> node.getName())
+                .toArray(String[]::new);
+
         CompiledGraph compiledGraph = stateGraph
                 .compile(CompileConfig.builder()
                         .saverConfig(graph.getAgent().getAgentStaticContext().getGraphSaverConfig())
                         .withLifecycleListener(graph.getAgentGraphListener().getStateGraphLifecycleListener())
+                        .interruptAfter(interruptNodes)
                         .build());
         agentRuntimeContext.setCompiledGraph(compiledGraph);
 
