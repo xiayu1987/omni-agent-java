@@ -7,6 +7,19 @@ spring:
 
 
   ai:
+    dashscope:
+      api-key: sk-f03153e453304d70bdcc236c2993d4be
+
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        sse:
+          connections:
+            server:
+              # 实际的连接地址为：http://localhost:20004/sse/mcp
+              url: http://localhost:20004/
+
     # openai:
     #   api-key: sk-fake-key
     #   base-url: http://100.64.0.1:12340/
@@ -19,8 +32,7 @@ spring:
     #     options:
     #       model: qwen3-14b
 
-    dashscope:
-      api-key: sk-f03153e453304d70bdcc236c2993d4be
+
 
     # memory:
     #   redis:

@@ -118,12 +118,6 @@ public class OmniAgentEngine implements IAgentEngine {
                 agentSessionManage.addSession(agentSession);
             }
 
-            // agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-            // .agent(agent)
-            // .agentRequest(agentEvent.getAgentRequest())
-            // .agentResponse(null)
-            // .build());
-
             agentEvent.setAgentSessionID(agentSession.getAgentSessionId());
 
             return agentSession;

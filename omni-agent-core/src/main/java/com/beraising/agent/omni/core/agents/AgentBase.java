@@ -54,20 +54,16 @@ public abstract class AgentBase implements IAgent {
                 getName(), new Function<AsToolRequest, AsToolResponse>() {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
+                        IAgentEvent agentEvent = null;
                         try {
-
-                            // getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
-                            // AgentEvent.builder().agentRequest(agentEvent.getAgentRequest())
-                            // .agentResponse(agentEvent.getAgentResponse())
-                            // .agentSessionID(agentEvent.getAgentSessionID())
-                            // .eventSource(EEventSource.SYSTEM)
-                            // .build());
-
-                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
+                            agentEvent = getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
                         } catch (Exception e) {
-                            return new AsToolResponse("表单未处理成功: " + e.getMessage());
+
+                            return AsToolResponse.builder().isSuccess(false).errorMessage("表单未处理成功: " + e.getMessage())
+                                    .build();
                         }
-                        return new AsToolResponse("已交由表单助手处理");
+                        return AsToolResponse.builder().isSuccess(true).agentResponse(agentEvent.getAgentResponse())
+                                .build();
                     }
                 })
                 .description(getDescription())

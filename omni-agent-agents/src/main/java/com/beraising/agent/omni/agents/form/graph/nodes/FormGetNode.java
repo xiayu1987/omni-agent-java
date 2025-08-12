@@ -7,9 +7,9 @@ import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
-public class FormParamInitNode extends GraphNodeBase<FormState> {
+public class FormGetNode extends GraphNodeBase<FormState> {
 
-    public FormParamInitNode(String name, IAgentGraph graph) {
+    public FormGetNode(String name, IAgentGraph graph) {
         super(name, graph);
     }
 
@@ -19,5 +19,7 @@ public class FormParamInitNode extends GraphNodeBase<FormState> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'apply'");
     }
+
+
 
 }

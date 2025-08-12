@@ -7,9 +7,9 @@ import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
-public class FormChooseNode extends GraphNodeBase<FormState> {
+public class FormSubmitNode extends GraphNodeBase<FormState> {
 
-    public FormChooseNode(String name, IAgentGraph graph) {
+    public FormSubmitNode(String name, IAgentGraph graph) {
         super(name, graph);
     }
 
@@ -19,7 +19,5 @@ public class FormChooseNode extends GraphNodeBase<FormState> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'apply'");
     }
-
-
 
 }
