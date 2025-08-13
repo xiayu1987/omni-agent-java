@@ -11,6 +11,7 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
+import com.beraising.agent.omni.core.graph.edge.IGraphEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
@@ -38,6 +39,8 @@ public interface IAgentGraph {
         void setGraphNodes(List<IGraphNode> graphNodes);
 
         List<IGraphNode> getGraphNodes();
+
+        List<IGraphEdge> getGraphEdges();
 
         IGraphState newGraphState();
 

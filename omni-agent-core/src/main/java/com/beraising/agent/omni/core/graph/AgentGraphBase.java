@@ -13,6 +13,7 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
+import com.beraising.agent.omni.core.graph.edge.IGraphEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
@@ -21,11 +22,13 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
     private IAgent agent;
     private IAgentGraphListener agentGraphListener;
     private List<IGraphNode> graphNodes;
+    private List<IGraphEdge> graphEdges;
     private IEventListener eventListener;
 
     public AgentGraphBase() {
         super();
         graphNodes = new ArrayList<>();
+        graphEdges = new ArrayList<>();
     }
 
     @Override
@@ -66,6 +69,15 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
     @Override
     public List<IGraphNode> getGraphNodes() {
         return graphNodes;
+    }
+
+    public void setGraphEdges(List<IGraphEdge> graphEdges) {
+        this.graphEdges = graphEdges;
+    }
+
+    @Override
+    public List<IGraphEdge> getGraphEdges() {
+        return graphEdges;
     }
 
     @Override
