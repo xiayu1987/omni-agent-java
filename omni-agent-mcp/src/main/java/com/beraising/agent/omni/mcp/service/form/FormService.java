@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 public class FormService {
 
     @Tool(description = "获取需填写的表单及字段信息")
-    public FormInfo getFormInfo(@ToolParam(description = "表单名称") String formName) {
+    public FormInfo getFormInfo(@ToolParam(description = "表单名称") EFormType formType) {
         return FormInfo.builder()
-                .formName(formName)
-                .formType(EFormType.LEAVE)
+                .formName(formType.getMessage())
+                .formType(formType)
                 .formFields(List.of(
                         FormField.builder()
                                 .fieldName("type")

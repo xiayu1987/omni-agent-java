@@ -1,6 +1,7 @@
 package com.beraising.agent.omni.core.graph.state;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
@@ -20,6 +21,14 @@ public interface IGraphState {
 
     default String getAgentRuntimeContextID() {
         return getState().value(IGraphState.getAgentRuntimeContextIDKey(), "");
+    }
+
+    default <T extends IGraphState> IUpdatedGraphState<T> getUpdatedSessionID(String value) {
+        return () -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put(IGraphState.getAgentSessionIDKey(), value);
+            return result;
+        };
     }
 
     static HashMap<String, KeyStrategy> getDefaultStateKeys() {

@@ -24,22 +24,4 @@ public class OmniAgentServiceApplication {
 		SpringApplication.run(OmniAgentServiceApplication.class, args);
 	}
 
-	@Bean
-	@Order(1)
-	public CommandLineRunner start(IAgentEngine omniAgentEngine,
-			ConfigurableApplicationContext context) {
-
-		return args -> {
-
-			omniAgentEngine.invoke(AgentEvent.builder()
-					.agentRequest(
-							AgentRequest.builder().requestType(EAgentRequestType.TEXT).requestData("我想明天请假")
-									.build())
-					.agentResponse(null)
-					.agentSessionID(null).build());
-
-			context.close();
-		};
-	}
-
 }

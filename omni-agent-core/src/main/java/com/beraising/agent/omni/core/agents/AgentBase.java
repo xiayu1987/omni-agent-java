@@ -54,15 +54,17 @@ public abstract class AgentBase implements IAgent {
                 getName(), new Function<AsToolRequest, AsToolResponse>() {
                     @Override
                     public AsToolResponse apply(AsToolRequest request) {
-                        IAgentEvent agentEvent = null;
+                        IAgentEvent agentEventResult = null;
                         try {
-                            agentEvent = getAgentStaticContext().getAgentEngine().invoke(AgentBase.this, agentEvent);
+                            agentEventResult = getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
+                                    agentEvent);
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                             return AsToolResponse.builder().isSuccess(false).errorMessage("表单未处理成功: " + e.getMessage())
                                     .build();
                         }
-                        return AsToolResponse.builder().isSuccess(true).agentResponse(agentEvent.getAgentResponse())
+                        return AsToolResponse.builder().isSuccess(true)
+                                .agentResponse(agentEventResult.getAgentResponse())
                                 .build();
                     }
                 })

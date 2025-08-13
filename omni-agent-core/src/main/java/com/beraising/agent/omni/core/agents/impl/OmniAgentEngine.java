@@ -129,20 +129,21 @@ public class OmniAgentEngine implements IAgentEngine {
                 throws Exception {
 
             IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
-            IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            IAgentRuntimeContext result = null;
 
-            if (agentRuntimeContext == null || agentRuntimeContext.isEnd()
-                    || !agent.getName().equals(agentRuntimeContext.getAgent().getName())
-                    || agentRuntimeContext.getCompiledGraph() == null) {
-                agentRuntimeContext = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
-                agentSessionManage.addAgentRuntimeContext(agentRuntimeContext);
+            if (lastAgentRuntimeContext == null || lastAgentRuntimeContext.isEnd()
+                    || !agent.getName().equals(lastAgentRuntimeContext.getAgent().getName())
+                    || lastAgentRuntimeContext.getCompiledGraph() == null) {
+                result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
+                agentSessionManage.addAgentRuntimeContext(result);
 
-                if (agentRuntimeContext != null) {
-                    agentRuntimeContext.setIsEnd(true);
+                if (lastAgentRuntimeContext != null) {
+                    lastAgentRuntimeContext.setIsEnd(true);
                 }
             }
 
-            return agentRuntimeContext;
+            return result;
         }
 
         @Override

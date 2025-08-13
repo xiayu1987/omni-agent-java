@@ -2,6 +2,7 @@ package com.beraising.agent.omni.agents.form.graph.impl;
 
 import java.util.Map;
 
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
@@ -13,6 +14,7 @@ import com.beraising.agent.omni.agents.form.graph.nodes.FormGetNode;
 import com.beraising.agent.omni.agents.form.graph.nodes.FormSubmitNode;
 import com.beraising.agent.omni.agents.form.graph.state.FormState;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.impl.AgentResponse;
@@ -30,16 +32,19 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     private static final String FORM_GET_INTERRUPT_NODE_NAME = "form_get_interrupt_node";
     private static final String FORM_SUBMIT_CONDITIONAL_EDGE_NAME = "form_submit_conditional_edge";
 
+    private ToolCallbackProvider formTools;
+
+    public FormGraph(ToolCallbackProvider formTools) {
+        super();
+        this.formTools = formTools;
+    }
+
     @Override
     public StateGraph getStateGraph(KeyStrategyFactory keyStrategyFactory) throws Exception {
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode(FORM_GET_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new FormGetNode(FORM_GET_NODE_NAME, this)))
-                .addNode(FORM_GET_INTERRUPT_NODE_NAME,
-                        AsyncNodeAction.node_async(
-                                new InterruptNode<FormState>(FORM_GET_INTERRUPT_NODE_NAME,
-                                        this)))
+                                new FormGetNode(FORM_GET_NODE_NAME, this, formTools)))
                 .addNode(FORM_SUBMIT_NODE_NAME,
                         AsyncNodeAction.node_async(
                                 new FormSubmitNode(FORM_SUBMIT_NODE_NAME,
@@ -60,16 +65,17 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
                 .addEdge(FORM_GET_INTERRUPT_NODE_NAME, FORM_SUBMIT_NODE_NAME)
                 .addConditionalEdges(FORM_SUBMIT_NODE_NAME,
                         AsyncEdgeAction
-                                .edge_async((new ConditionalEdge<FormState>(FORM_SUBMIT_CONDITIONAL_EDGE_NAME, this,
-                                        (graphState, agentRuntimeContext, agentEvent) -> {
+                                .edge_async((new ConditionalEdge<FormState>(
+                                        FORM_SUBMIT_CONDITIONAL_EDGE_NAME, this,
+                                        (graphState, agentRuntimeContext,
+                                                agentEvent) -> {
                                             return "form_submit";
                                         }))),
                         Map.of(
                                 FORM_GET_INTERRUPT_NODE_NAME,
                                 FORM_GET_INTERRUPT_NODE_NAME,
                                 StateGraph.END,
-                                StateGraph.END))
-                .addEdge(FORM_SUBMIT_NODE_NAME, StateGraph.END);
+                                StateGraph.END));
 
         return stateGraph;
     }
@@ -96,6 +102,12 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     @Override
     public IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
             IGraphNode graphNode, FormState graphState) {
+
+        if (graphNode.getName().equals(FORM_GET_INTERRUPT_NODE_NAME)) {
+            return AgentResponse.builder().responseType(EAgentResponseType.FORM)
+                    .responseData(graphState.getFormResult()).build();
+        }
+
         return AgentResponse.builder().build();
     }
 
