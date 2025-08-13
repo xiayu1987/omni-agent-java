@@ -96,7 +96,8 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             throw new Exception("AgentRuntimeContext has no AgentEvent");
         }
 
-        RunnableConfig runnableConfig = RunnableConfig.builder().threadId(agentRuntimeContext.getAgentSessionID())
+        RunnableConfig runnableConfig = RunnableConfig.builder()
+                .threadId(agentRuntimeContext.getAgentRuntimeContextID())
                 .build();
 
         IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
@@ -116,15 +117,18 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             state.withResume();
 
             IGraphNode nextNode = this.getGraphNodes().stream()
-                    .filter(node -> node.getName().equals(runnableConfig.nextNode().orElse("")))
+                    .filter(node -> node.getName().equals(stateSnapshot.config().nextNode().orElse("")))
                     .findFirst().orElse(null);
 
             if (nextNode == null) {
                 throw new Exception("Next node not found");
             }
 
+            state.withHumanFeedback(
+                    new OverAllState.HumanFeedback(createFeedBack(agentEvent, agentRuntimeContext, nextNode), ""));
+
             agentRuntimeContext.getCompiledGraph()
-                    .invoke(createFeedBack(agentEvent, agentRuntimeContext, nextNode), runnableConfig);
+                    .invoke(state, runnableConfig);
 
         }
 

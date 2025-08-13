@@ -3,6 +3,8 @@ package com.beraising.agent.omni.agents.form.graph.impl;
 import java.util.Map;
 
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
@@ -26,6 +28,9 @@ import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 @Component
 public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
+
+    private Resource formFormat;
+
     private static final String FORM_GET_NODE_NAME = "form_get_node";
     private static final String FORM_SUBMIT_NODE_NAME = "form_submit_node";
     private static final String FORM_SUBMIT_INTERRUPT_NODE_NAME = "form_submit_interrupt_node";
@@ -34,9 +39,11 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
 
     private ToolCallbackProvider formTools;
 
-    public FormGraph(ToolCallbackProvider formTools) {
+    public FormGraph(ToolCallbackProvider formTools,
+            @Value("classpath:agents-prompts/form-format.txt") Resource formFormat) {
         super();
         this.formTools = formTools;
+        this.formFormat = formFormat;
     }
 
     @Override
@@ -44,7 +51,7 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode(FORM_GET_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new FormGetNode(FORM_GET_NODE_NAME, this, formTools)))
+                                new FormGetNode(FORM_GET_NODE_NAME, this, formTools, formFormat)))
                 .addNode(FORM_SUBMIT_NODE_NAME,
                         AsyncNodeAction.node_async(
                                 new FormSubmitNode(FORM_SUBMIT_NODE_NAME,

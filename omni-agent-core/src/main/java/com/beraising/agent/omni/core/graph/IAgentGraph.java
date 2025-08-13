@@ -40,6 +40,8 @@ public interface IAgentGraph {
 
         List<IGraphNode> getGraphNodes();
 
+        void setGraphEdges(List<IGraphEdge> graphEdges);
+
         List<IGraphEdge> getGraphEdges();
 
         IGraphState newGraphState();

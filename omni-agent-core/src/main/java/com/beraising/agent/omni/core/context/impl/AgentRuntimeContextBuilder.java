@@ -1,5 +1,6 @@
 package com.beraising.agent.omni.core.context.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -52,6 +53,8 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
             return result;
         };
 
+        graph.setGraphNodes(new ArrayList<>());
+        graph.setGraphEdges(new ArrayList<>());
         StateGraph stateGraph = graph.getStateGraph(keyStrategyFactory);
 
         String[] interruptNodes = graph.getGraphNodes().stream()

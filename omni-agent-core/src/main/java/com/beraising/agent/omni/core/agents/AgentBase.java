@@ -8,6 +8,7 @@ import com.alibaba.cloud.ai.graph.GraphLifecycleListener;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
@@ -61,6 +62,17 @@ public abstract class AgentBase implements IAgent {
                         } catch (Exception e) {
                             e.printStackTrace();
                             return AsToolResponse.builder().isSuccess(false).errorMessage("表单未处理成功: " + e.getMessage())
+                                    .build();
+                        }
+                        if (agentEventResult.getAgentResponse() == null) {
+                            return AsToolResponse.builder().isSuccess(false)
+                                    .errorMessage("表单未处理成功: agent response is null")
+                                    .build();
+                        }
+                        if (agentEventResult.getAgentResponse().getResponseType() == EAgentResponseType.ERROR) {
+                            return AsToolResponse.builder().isSuccess(false)
+                                    .errorMessage("表单未处理成功: agent response is error:"
+                                            + agentEventResult.getAgentResponse().getResponseData())
                                     .build();
                         }
                         return AsToolResponse.builder().isSuccess(true)

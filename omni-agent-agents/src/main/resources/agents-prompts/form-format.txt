@@ -1,0 +1,28 @@
+正确返回表单输出格式
+{
+  "isSuccess": true,
+  "errorMessage": "",
+  "formInfo": {
+    "formName": "",
+    "formType": "",
+    "formFields": [
+      {
+        "fieldName": "",
+        "fieldType": ""
+      },
+      {
+        "fieldName": "",
+        "fieldType": ""
+      },
+      {
+        "fieldName": "",
+        "fieldType": ""
+      }
+    ]
+  }
+}
+错误返回表单输出格式
+{
+  "isSuccess": false,
+  "errorMessage": ""
+}

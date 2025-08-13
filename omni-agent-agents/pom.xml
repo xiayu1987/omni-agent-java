@@ -12,6 +12,7 @@
     <groupId>com.beraising.agent</groupId>
     <artifactId>omni-agent-agents</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

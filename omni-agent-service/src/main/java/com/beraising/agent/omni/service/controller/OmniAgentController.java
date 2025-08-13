@@ -1,6 +1,5 @@
 package com.beraising.agent.omni.service.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +11,8 @@ import com.beraising.agent.omni.core.event.impl.AgentRequest;
 import com.beraising.agent.omni.service.dto.AgentEventDTO;
 import com.beraising.agent.omni.service.dto.AgentResponseDTO;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class OmniAgentController {
 
     private IAgentEngine omniAgentEngine;
+
 
     public OmniAgentController(IAgentEngine omniAgentEngine) {
         super();
@@ -44,7 +46,9 @@ public class OmniAgentController {
                     .agentResponse(null)
                     .agentSessionID(agentEventDTO.getAgentSessionID()).build());
 
-            result = AgentEventDTO.builder().agentRequest(null)
+            result = AgentEventDTO.builder()
+                    .agentSessionID(agentResult.getAgentSessionID())
+                    .agentRequest(null)
                     .agentResponse(AgentResponseDTO.builder()
                             .responseType(agentResult.getAgentResponse().getResponseType().getCode())
                             .responseData(agentResult.getAgentResponse().getResponseData())
