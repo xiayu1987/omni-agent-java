@@ -1,7 +1,8 @@
+输出格式json
 正确返回表单输出格式
 {
   "isSuccess": true,
-  "errorMessage": "",
+  "message": "",
   "formInfo": {
     "formName": "",
     "formType": "",
@@ -24,5 +25,5 @@
 错误返回表单输出格式
 {
   "isSuccess": false,
-  "errorMessage": ""
+  "message": "" //错误信息
 }

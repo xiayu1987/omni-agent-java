@@ -30,20 +30,19 @@ public class FormGetNode extends GraphNodeBase<FormState> {
     public IUpdatedGraphState<FormState> apply(FormState graphState, IAgentRuntimeContext agentRuntimeContext,
             IAgentEvent agentEvent) throws Exception {
 
+        SystemMessage systemMessageNotFound = new SystemMessage("未找到工具输出错误");
         SystemMessage systemMessageFormat = new SystemMessage(this.formFormat);
         SystemMessage systemMessageStep = new SystemMessage(getName());
         UserMessage userMessage = new UserMessage(graphState.getUserInput());
         Prompt prompt = new Prompt(List.of(
-                userMessage,
-                systemMessageFormat,
-                systemMessageStep));
+                userMessage, systemMessageStep, systemMessageFormat, systemMessageNotFound));
 
         String content = getChatClient().prompt(prompt)
                 .toolCallbacks(this.formTools).call().content();
 
         String jsonStr = content.replaceAll("(?s)```json\\s*(.*?)\\s*```", "$1");
 
-        return graphState.getUpdatedFormResult(jsonStr);
+        return graphState.getUpdatedFormGetResult(jsonStr);
     }
 
 }

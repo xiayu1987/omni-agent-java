@@ -11,12 +11,14 @@ import com.beraising.agent.omni.agents.router.graph.IAgentRouterGraph;
 import com.beraising.agent.omni.agents.router.graph.nodes.RouteNode;
 import com.beraising.agent.omni.agents.router.graph.state.RouterState;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.AgentGraphBase;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
+import com.google.gson.Gson;
 
 @Component
 public class AgentRouterGraph extends AgentGraphBase<RouterState> implements IAgentRouterGraph {
@@ -59,6 +61,12 @@ public class AgentRouterGraph extends AgentGraphBase<RouterState> implements IAg
     @Override
     public IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
             IGraphNode graphNode, RouterState graphState) {
+
+        if (graphNode == null) {
+            return AgentResponse.builder().responseType(EAgentResponseType.TEXT)
+                    .responseData(graphState.getRouterResult()).build();
+        }
+
         return AgentResponse.builder().build();
     }
 

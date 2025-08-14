@@ -11,7 +11,7 @@ import com.beraising.agent.omni.mcp.service.form.FormService;
 public class ToolConfiguration {
 
     @Bean
-    public ToolCallbackProvider weatherTools(FormService formService) {
+    public ToolCallbackProvider formTools(FormService formService) {
         return MethodToolCallbackProvider.builder().toolObjects(formService).build();
     }
 

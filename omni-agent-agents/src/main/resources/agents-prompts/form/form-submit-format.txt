@@ -1,0 +1,16 @@
+输出格式json
+正确提交返回表单输出格式
+{
+  "resultType": 0,
+  "message": "" //成功信息
+}
+提交表单有业务错误返回输出格式
+{
+  "resultType": 1,
+  "message": "" //错误信息
+}
+系统错误返回输出格式
+{
+  "resultType": 2,
+  "message": "" //错误信息
+}

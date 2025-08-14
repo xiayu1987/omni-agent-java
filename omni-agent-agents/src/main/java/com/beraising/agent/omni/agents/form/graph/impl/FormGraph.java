@@ -15,6 +15,7 @@ import com.beraising.agent.omni.agents.form.graph.IFormGraph;
 import com.beraising.agent.omni.agents.form.graph.nodes.FormGetNode;
 import com.beraising.agent.omni.agents.form.graph.nodes.FormSubmitNode;
 import com.beraising.agent.omni.agents.form.graph.state.FormState;
+import com.beraising.agent.omni.agents.form.graph.state.FormSubmitData;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
@@ -25,11 +26,10 @@ import com.beraising.agent.omni.core.graph.edge.impl.ConditionalEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.node.impl.InterruptNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
+import com.google.gson.Gson;
 
 @Component
 public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
-
-    private Resource formFormat;
 
     private static final String FORM_GET_NODE_NAME = "form_get_node";
     private static final String FORM_SUBMIT_NODE_NAME = "form_submit_node";
@@ -38,12 +38,16 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     private static final String FORM_SUBMIT_CONDITIONAL_EDGE_NAME = "form_submit_conditional_edge";
 
     private ToolCallbackProvider formTools;
+    private Resource formGetFormat;
+    private Resource formSubmitFormat;
 
     public FormGraph(ToolCallbackProvider formTools,
-            @Value("classpath:agents-prompts/form-format.txt") Resource formFormat) {
+            @Value("classpath:agents-prompts/form/form-get-format.txt") Resource formGetFormat,
+            @Value("classpath:agents-prompts/form/form-submit-format.txt") Resource formSubmitFormat) {
         super();
         this.formTools = formTools;
-        this.formFormat = formFormat;
+        this.formGetFormat = formGetFormat;
+        this.formSubmitFormat = formSubmitFormat;
     }
 
     @Override
@@ -51,21 +55,16 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode(FORM_GET_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new FormGetNode(FORM_GET_NODE_NAME, this, formTools, formFormat)))
+                                new FormGetNode(FORM_GET_NODE_NAME, this, formTools, formGetFormat)))
                 .addNode(FORM_SUBMIT_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new FormSubmitNode(FORM_SUBMIT_NODE_NAME,
-                                        this)))
+                                new FormSubmitNode(FORM_SUBMIT_NODE_NAME, this, formTools, formSubmitFormat)))
                 .addNode(FORM_SUBMIT_INTERRUPT_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new InterruptNode<FormState>(
-                                        FORM_SUBMIT_INTERRUPT_NODE_NAME,
-                                        this)))
+                                new InterruptNode<FormState>(FORM_SUBMIT_INTERRUPT_NODE_NAME, this)))
                 .addNode(FORM_GET_INTERRUPT_NODE_NAME,
                         AsyncNodeAction.node_async(
-                                new InterruptNode<FormState>(
-                                        FORM_GET_INTERRUPT_NODE_NAME,
-                                        this)))
+                                new InterruptNode<FormState>(FORM_GET_INTERRUPT_NODE_NAME, this)))
 
                 .addEdge(StateGraph.START, FORM_GET_NODE_NAME)
                 .addEdge(FORM_GET_NODE_NAME, FORM_GET_INTERRUPT_NODE_NAME)
@@ -76,11 +75,23 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
                                         FORM_SUBMIT_CONDITIONAL_EDGE_NAME, this,
                                         (graphState, agentRuntimeContext,
                                                 agentEvent) -> {
-                                            return "form_submit";
+                                            if (graphState.getFormSubmitResult()
+                                                    .getResultType() == FormSubmitData.SUCCESS) {
+                                                return StateGraph.END;
+                                            }
+                                            if (graphState.getFormSubmitResult()
+                                                    .getResultType() == FormSubmitData.SYSTEMERROR) {
+                                                return StateGraph.END;
+                                            }
+                                            if (graphState.getFormSubmitResult()
+                                                    .getResultType() == FormSubmitData.BIZERROR) {
+                                                return FORM_GET_NODE_NAME;
+                                            }
+                                            return "";
                                         }))),
                         Map.of(
-                                FORM_GET_INTERRUPT_NODE_NAME,
-                                FORM_GET_INTERRUPT_NODE_NAME,
+                                FORM_GET_NODE_NAME,
+                                FORM_GET_NODE_NAME,
                                 StateGraph.END,
                                 StateGraph.END));
 
@@ -103,16 +114,23 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     @Override
     public void putFeedBack(Map<String, Object> feedBack, IAgentRuntimeContext agentRuntimeContext,
             IAgentEvent agentEvent, IGraphNode graphNode, FormState graphState) {
-
+        if (graphNode.getName().equals(FORM_SUBMIT_NODE_NAME)) {
+            graphState.putFormDataFeedback(feedBack, agentRuntimeContext, agentEvent);
+        }
     }
 
     @Override
     public IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
             IGraphNode graphNode, FormState graphState) {
 
+        if (graphNode == null) {
+            return AgentResponse.builder().responseType(EAgentResponseType.FORM)
+                    .responseData(new Gson().toJson(graphState.getFormSubmitResult())).build();
+        }
+
         if (graphNode.getName().equals(FORM_GET_INTERRUPT_NODE_NAME)) {
             return AgentResponse.builder().responseType(EAgentResponseType.FORM)
-                    .responseData(graphState.getFormResult()).build();
+                    .responseData(graphState.getFormGetResult()).build();
         }
 
         return AgentResponse.builder().build();
