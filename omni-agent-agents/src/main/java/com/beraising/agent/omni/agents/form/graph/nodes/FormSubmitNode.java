@@ -32,12 +32,13 @@ public class FormSubmitNode extends GraphNodeBase<FormState> {
     public IUpdatedGraphState<FormState> apply(FormState graphState, IAgentRuntimeContext agentRuntimeContext,
             IAgentEvent agentEvent) throws Exception {
 
-        SystemMessage systemMessageNotFound = new SystemMessage("未找到工具输出错误");
+        SystemMessage systemMessageRule = new SystemMessage("1.只通过工具提交");
+        SystemMessage systemMessageStep = new SystemMessage("当前任务提交表单");
         SystemMessage systemMessageFormat = new SystemMessage(this.formSubmitFormat);
-        SystemMessage systemMessageStep = new SystemMessage(getName());
+
         UserMessage userMessage = new UserMessage(graphState.getFormDataFeedback());
         Prompt prompt = new Prompt(List.of(
-                userMessage, systemMessageStep, systemMessageFormat, systemMessageNotFound));
+                userMessage, systemMessageStep, systemMessageFormat, systemMessageRule));
 
         String content = getChatClient().prompt(prompt)
                 .toolCallbacks(this.formTools).call().content();

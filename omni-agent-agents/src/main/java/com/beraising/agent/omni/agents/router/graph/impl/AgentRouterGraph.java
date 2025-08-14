@@ -18,7 +18,6 @@ import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.AgentGraphBase;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
-import com.google.gson.Gson;
 
 @Component
 public class AgentRouterGraph extends AgentGraphBase<RouterState> implements IAgentRouterGraph {

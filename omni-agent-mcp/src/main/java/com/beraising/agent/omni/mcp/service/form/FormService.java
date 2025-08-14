@@ -7,15 +7,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class FormService {
 
+    private static int GETCOUNT = 0;
+    private static int SUBMITCOUNT = 1;
+
     @Tool(description = "获取需填写的表单及字段信息")
     public String getFormInfo(@ToolParam(description = "表单名称") EFormType formType) {
 
-        if (formType == EFormType.TEST_ERROR) {
-            return "{\r\n" + //
-                    "  \"isSuccess\": false,\r\n" + //
-                    "  \"message\": \"表单服务不可用\"\r\n" + //
-                    "}";
-        }
+        GETCOUNT++;
 
         return "\"formInfo\": {\r\n" + //
                 "    \"formName\": \"请假\",\r\n" + //
@@ -35,21 +33,26 @@ public class FormService {
                 "      }\r\n" + //
                 "    ]\r\n" + //
                 "  }";
+
     }
 
     @Tool(description = "提交表单数据")
     public String submitForm(@ToolParam(description = "表单名称") EFormType formType,
             @ToolParam(description = "表单数据") String formData) {
 
-        if (formType == EFormType.TEST_ERROR) {
+        SUBMITCOUNT++;
+
+        if (SUBMITCOUNT < 3) {
             return "{\r\n" + //
                     "  \"isSuccess\": false,\r\n" + //
                     "  \"message\": \"时间不能为空\"\r\n" + //
                     "}";
+        } else {
+            SUBMITCOUNT = 0;
+            return "{\r\n" + //
+                    "  \"isSuccess\": true,\r\n" + //
+                    "}";
         }
 
-        return "{\r\n" + //
-                "  \"isSuccess\": true,\r\n" + //
-                "}";
     }
 }

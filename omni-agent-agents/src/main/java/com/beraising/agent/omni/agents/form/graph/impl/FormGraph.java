@@ -87,7 +87,7 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
                                                     .getResultType() == FormSubmitData.BIZERROR) {
                                                 return FORM_GET_NODE_NAME;
                                             }
-                                            return "";
+                                            return StateGraph.END;
                                         }))),
                         Map.of(
                                 FORM_GET_NODE_NAME,

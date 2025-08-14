@@ -14,6 +14,8 @@ import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 public class FormGetNode extends GraphNodeBase<FormState> {
 
@@ -30,17 +32,24 @@ public class FormGetNode extends GraphNodeBase<FormState> {
     public IUpdatedGraphState<FormState> apply(FormState graphState, IAgentRuntimeContext agentRuntimeContext,
             IAgentEvent agentEvent) throws Exception {
 
-        SystemMessage systemMessageNotFound = new SystemMessage("未找到工具输出错误");
+        SystemMessage systemMessageRule = new SystemMessage("1.每次重新获取表单信息2.获取失败生成错误信息3.只通过工具获取");
+        SystemMessage systemMessageStep = new SystemMessage("当前任务获取表单");
         SystemMessage systemMessageFormat = new SystemMessage(this.formFormat);
-        SystemMessage systemMessageStep = new SystemMessage(getName());
+
         UserMessage userMessage = new UserMessage(graphState.getUserInput());
         Prompt prompt = new Prompt(List.of(
-                userMessage, systemMessageStep, systemMessageFormat, systemMessageNotFound));
+                userMessage, systemMessageStep, systemMessageFormat, systemMessageRule));
 
         String content = getChatClient().prompt(prompt)
                 .toolCallbacks(this.formTools).call().content();
 
         String jsonStr = content.replaceAll("(?s)```json\\s*(.*?)\\s*```", "$1");
+
+        JsonObject jsonObject = new Gson().fromJson(jsonStr, JsonObject.class);
+        boolean isSuccess = jsonObject.get("isSuccess").getAsBoolean();
+        if (isSuccess == false) {
+            throw new Exception(jsonStr);
+        }
 
         return graphState.getUpdatedFormGetResult(jsonStr);
     }
