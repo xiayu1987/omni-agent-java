@@ -85,15 +85,16 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
                                             }
                                             if (graphState.getFormSubmitResult()
                                                     .getResultType() == FormSubmitData.BIZERROR) {
-                                                return FORM_GET_NODE_NAME;
+                                                return FORM_SUBMIT_INTERRUPT_NODE_NAME;
                                             }
                                             return StateGraph.END;
                                         }))),
                         Map.of(
-                                FORM_GET_NODE_NAME,
-                                FORM_GET_NODE_NAME,
+                                FORM_SUBMIT_INTERRUPT_NODE_NAME,
+                                FORM_SUBMIT_INTERRUPT_NODE_NAME,
                                 StateGraph.END,
-                                StateGraph.END));
+                                StateGraph.END))
+                .addEdge(FORM_SUBMIT_INTERRUPT_NODE_NAME, FORM_SUBMIT_NODE_NAME);
 
         return stateGraph;
     }
@@ -131,6 +132,11 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
         if (graphNode.getName().equals(FORM_GET_INTERRUPT_NODE_NAME)) {
             return AgentResponse.builder().responseType(EAgentResponseType.FORM)
                     .responseData(graphState.getFormGetResult()).build();
+        }
+
+        if (graphNode.getName().equals(FORM_SUBMIT_INTERRUPT_NODE_NAME)) {
+            return AgentResponse.builder().responseType(EAgentResponseType.FORM)
+                    .responseData(new Gson().toJson(graphState.getFormSubmitResult())).build();
         }
 
         return AgentResponse.builder().build();

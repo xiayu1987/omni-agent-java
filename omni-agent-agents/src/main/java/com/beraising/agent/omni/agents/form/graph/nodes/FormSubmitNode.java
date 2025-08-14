@@ -1,6 +1,7 @@
 package com.beraising.agent.omni.agents.form.graph.nodes;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -34,11 +35,16 @@ public class FormSubmitNode extends GraphNodeBase<FormState> {
 
         SystemMessage systemMessageRule = new SystemMessage("1.只通过工具提交");
         SystemMessage systemMessageStep = new SystemMessage("当前任务提交表单");
-        SystemMessage systemMessageFormat = new SystemMessage(this.formSubmitFormat);
+        SystemMessage systemMessageOutputFormat = new SystemMessage(this.formSubmitFormat);
+        SystemMessage systemMessageInputFormat = new SystemMessage(
+                "按表单字段将用户数据构成json数据提供给工具:" + graphState.getFormGetResult());
+        UserMessage userMessage = new UserMessage(new Gson().toJson(agentRuntimeContext.getAgentEvents().stream()
+                .map(item -> item.getAgentRequest().getRequestData())
+                .collect(Collectors.toList())));
 
-        UserMessage userMessage = new UserMessage(graphState.getFormDataFeedback());
         Prompt prompt = new Prompt(List.of(
-                userMessage, systemMessageStep, systemMessageFormat, systemMessageRule));
+                userMessage, systemMessageStep, systemMessageOutputFormat, systemMessageInputFormat,
+                systemMessageRule));
 
         String content = getChatClient().prompt(prompt)
                 .toolCallbacks(this.formTools).call().content();
