@@ -1,42 +1,43 @@
 <script setup lang="ts">
-import { onMounted, onUpdated, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
+import { Delete } from '@element-plus/icons-vue'
+import { useStore } from '../composables/useStore'
 import { useChat } from '../composables/useChat'
 import MessageList from './MessageList.vue'
 import ChatInput from './ChatInput.vue'
 
+const { currentMessages, clearMessages } = useStore()
+const { loading, send } = useChat()
 
-const { state, send, reset } = useChat()
-const scroller = ref<HTMLDivElement | null>(null)
-
-
+const scroller = ref<HTMLElement | null>(null)
 function scrollToBottom() {
-    const el = scroller.value
-    if (!el) return
+    const el = scroller.value; if (!el) return
     el.scrollTop = el.scrollHeight
 }
 
+watch(() => currentMessages().length, () => nextTick(scrollToBottom))
 
 onMounted(scrollToBottom)
-onUpdated(scrollToBottom)
 </script>
 
-
 <template>
-    <div class="chat">
-        <div class="toolbar">
-            <div class="subtle">共 {{ state.messages.length }} 条消息</div>
-            <div style="display:flex; gap:8px;">
-                <button class="icon-btn" @click="reset">清空</button>
+    <el-card class="chat-card" shadow="never"
+        body-style="padding:0;height:calc(100vh - 110px);display:flex;flex-direction:column">
+        <div
+            style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1f2937">
+            <div style="opacity:.8;font-size:12px">{{ currentMessages().length }} 条消息</div>
+            <div style="display:flex;gap:8px">
+                <el-button @click="clearMessages" :icon="Delete">清空</el-button>
             </div>
         </div>
 
-
-        <div ref="scroller" class="scroller">
-            <MessageList :messages="state.messages" />
-            <div v-if="!state.messages.length" class="empty">开始对话吧，问我任何问题～</div>
+        <div ref="scroller" class="chat-scroller">
+            <MessageList :messages="currentMessages()" />
+            <div v-if="!currentMessages().length" style="opacity:.7;text-align:center;margin-top:12px">开始对话吧～</div>
         </div>
 
-
-        <ChatInput :loading="state.loading" @send="send" />
-    </div>
+        <div class="footer-input">
+            <ChatInput :loading="loading" @send="send" />
+        </div>
+    </el-card>
 </template>

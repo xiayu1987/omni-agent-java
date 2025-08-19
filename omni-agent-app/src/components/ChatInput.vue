@@ -1,27 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
+import { Promotion } from '@element-plus/icons-vue'
 
 const props = defineProps<{ loading: boolean }>()
 const emit = defineEmits<{ (e: 'send', text: string): void }>()
 
-
 const text = ref('')
-
-
-function onSubmit() {
-    const t = text.value.trim()
-    if (!t) return
-    emit('send', t)
-    text.value = ''
-}
+function onSend() { const t = text.value.trim(); if (!t) return; emit('send', t); text.value = '' }
 </script>
 
-
 <template>
-    <div class="inputbar">
-        <textarea v-model="text" placeholder="输入你的问题，Shift+Enter 换行，Enter 发送" @keydown.enter.exact.prevent="onSubmit"
+    <div style="display:flex;gap:8px;align-items:flex-end">
+        <el-input v-model="text" type="textarea" :autosize="{ minRows: 1, maxRows: 6 }"
+            placeholder="输入消息，Enter 发送，Shift+Enter 换行" @keydown.enter.exact.prevent="onSend"
             @keydown.enter.shift.exact.stop />
-        <button class="send" :disabled="loading" @click="onSubmit">发送</button>
+        <el-button type="primary" :loading="loading" @click="onSend" :icon="Promotion">发送</el-button>
     </div>
 </template>
