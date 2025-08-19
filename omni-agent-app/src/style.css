@@ -7,6 +7,7 @@ body,
 
 body {
   background: #0b1020;
+  margin: 0px;
 }
 
 .el-container.full {
@@ -15,21 +16,21 @@ body {
 }
 
 .header-bar {
-  background: #0f172a;
+  background: #181818;
   border-bottom: 1px solid #1f2937;
 }
 
 .sidebar {
-  background: #0f172a;
+  background: #181818;
   border-right: 1px solid #1f2937;
 }
 
 .main-panel {
-  background: #0b1220;
+  background: #1b1b1b;
 }
 
 .chat-card {
-  background: #0f172a;
+  background: #181818;
   border: 1px solid #1f2937;
 }
 
@@ -67,7 +68,7 @@ body {
 .footer-input {
   position: sticky;
   bottom: 0;
-  background: #0f172a;
+  background: #181818;
   border-top: 1px solid #1f2937;
   padding: 8px;
 }

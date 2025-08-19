@@ -31,10 +31,13 @@ onMounted(scrollToBottom)
             </div>
         </div>
 
-        <div ref="scroller" class="chat-scroller">
+        <el-scrollbar ref="scroller" class="chat-scroller">
             <MessageList :messages="currentMessages()" />
-            <div v-if="!currentMessages().length" style="opacity:.7;text-align:center;margin-top:12px">开始对话吧～</div>
-        </div>
+        </el-scrollbar>
+
+
+        <div v-if="!currentMessages().length" style="opacity:.7;text-align:center;margin-top:12px">开始对话吧～</div>
+
 
         <div class="footer-input">
             <ChatInput :loading="loading" @send="send" />

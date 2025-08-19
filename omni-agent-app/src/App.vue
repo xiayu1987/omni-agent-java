@@ -15,8 +15,8 @@ const { isMobile } = useResponsive()
     <el-header height="54" class="header-bar">
       <div style="display:flex;align-items:center;gap:10px;height:54px;color:#e2e8f0">
         <el-button v-if="isMobile" @click="drawer = true" :icon="Menu" circle />
-        <span style="font-weight:700">ChatGPT UI</span>
-        <span style="opacity:.7;font-size:12px">Vue3 + TS + Element Plus</span>
+        <span style="font-weight:700">OMNI AGENT</span>
+        <span style="opacity:.7;font-size:12px"></span>
       </div>
     </el-header>
 

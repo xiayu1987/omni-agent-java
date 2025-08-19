@@ -13,6 +13,20 @@ function startRename(id: string, title: string) { renamingId.value = id; renameT
 function confirmRename() { if (renamingId.value) { renameSession(renamingId.value, renameText.value.trim() || '未命名'); renamingId.value = null } }
 </script>
 
+<style lang="css" scoped>
+.el-menu {
+    background-color: transparent;
+
+    .el-menu-item {
+        color: white;
+    }
+
+    .el-menu-item:hover{
+        background-color: #333333;
+    }
+}
+</style>
+
 <template>
     <div style="padding:12px;color:#e2e8f0">
         <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -20,10 +34,10 @@ function confirmRename() { if (renamingId.value) { renameSession(renamingId.valu
         </div>
 
         <el-scrollbar height="calc(100vh - 140px)">
-            <el-menu :default-active="state.currentId || ''" class="el-menu-vertical-demo"
+            <el-menu :default-active="state.currentId || ''" class="el-menu"
                 @select="(id: string) => { switchSession(id); emit('select', id) }">
                 <template v-for="s in state.sessions" :key="s.id">
-                    <el-menu-item :index="s.id">
+                    <el-menu-item class="el-menu-item" :index="s.id">
                         <template #title>
                             <div
                                 style="display:flex;align-items:center;gap:8px;width:100%;justify-content:space-between">
