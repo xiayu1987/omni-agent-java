@@ -13,7 +13,7 @@
 
 	<groupId>com.beraising.agent</groupId>
 	<artifactId>omni-agent-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 
 	<name>omni-agent-service</name>
 	<description>omni-agent-service</description>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>com.beraising.agent</groupId>
 			<artifactId>omni-agent-agents</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${revision}</version>
 		</dependency>
 
 

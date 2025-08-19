@@ -14,7 +14,7 @@
 
   <groupId>com.beraising.agent</groupId>
   <artifactId>omni-agent-core</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
 
   <name>omni-agent-core</name>
