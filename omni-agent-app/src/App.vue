@@ -9,6 +9,12 @@ const drawer = ref(false)
 const { isMobile } = useResponsive()
 </script>
 
+<style lang="css" scoped>
+.sidebar {
+  width: 260px;
+}
+</style>
+
 <template>
   <el-container class="full">
     <!-- 头部 -->
@@ -22,7 +28,7 @@ const { isMobile } = useResponsive()
 
     <el-container>
       <!-- 左侧会话（PC 显示） -->
-      <el-aside v-if="!isMobile" width="260" class="sidebar">
+      <el-aside v-if="!isMobile" class="sidebar">
         <SessionSidebar />
       </el-aside>
 

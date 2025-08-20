@@ -19,38 +19,82 @@ function confirmRename() { if (renamingId.value) { renameSession(renamingId.valu
 
     .el-menu-item {
         color: white;
+
+        .session-item-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: space-between;
+
+            .session-title {
+                overflow: hidden;
+            }
+
+            .el-button {
+                background-color: transparent;
+                color: white;
+                border: none;
+                border-radius: 0%;
+                padding: 0px;
+                margin: 0px;
+            }
+        }
     }
 
-    .el-menu-item:hover{
+    .el-menu-item:hover {
         background-color: #333333;
     }
+}
+
+/* 提取的内联样式（已改名） */
+.session-list-wrapper {
+    padding: 12px;
+    color: #e2e8f0;
+}
+
+.session-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.session-rename-input {
+    max-width: 140px;
+}
+
+.session-actions {
+    display: flex;
+    gap: 5px;
 }
 </style>
 
 <template>
-    <div style="padding:12px;color:#e2e8f0">
-        <div style="display:flex;gap:8px;margin-bottom:8px">
+    <div class="session-list-wrapper">
+        <div class="session-header">
             <el-button type="primary" @click="newSession" :icon="Plus">新建会话</el-button>
         </div>
 
-        <el-scrollbar height="calc(100vh - 140px)">
+        <el-scrollbar>
             <el-menu :default-active="state.currentId || ''" class="el-menu"
                 @select="(id: string) => { switchSession(id); emit('select', id) }">
                 <template v-for="s in state.sessions" :key="s.id">
                     <el-menu-item class="el-menu-item" :index="s.id">
                         <template #title>
-                            <div
-                                style="display:flex;align-items:center;gap:8px;width:100%;justify-content:space-between">
-                                <div v-if="renamingId !== s.id">{{ s.title }}</div>
+                            <div class="session-item-content">
+                                <div class="session-title" v-if="renamingId !== s.id">{{ s.title }}</div>
                                 <el-input v-else v-model="renameText" size="small" @keyup.enter="confirmRename"
-                                    @blur="confirmRename" style="max-width:140px" />
-                                <div style="display:flex;gap:6px">
-                                    <el-tooltip content="重命名"><el-button @click.stop="startRename(s.id, s.title)"
-                                            :icon="Edit" circle size="small" /></el-tooltip>
+                                    @blur="confirmRename" class="session-rename-input" />
+                                <div class="session-actions">
+                                    <el-tooltip content="重命名">
+                                        <el-button class="el-button" @click.stop="startRename(s.id, s.title)"
+                                            :icon="Edit" circle size="small" />
+                                    </el-tooltip>
                                     <el-popconfirm title="确定删除该会话？" confirm-button-text="删除" cancel-button-text="取消"
                                         @confirm="deleteSession(s.id)">
                                         <template #reference>
-                                            <el-button @click.stop :icon="Delete" circle size="small" />
+                                            <el-button class="el-button" @click.stop :icon="Delete" circle
+                                                size="small" />
                                         </template>
                                     </el-popconfirm>
                                 </div>
