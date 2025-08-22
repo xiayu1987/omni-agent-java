@@ -116,7 +116,7 @@ core/
 ## 🚀 快速开始
 
 ```bash
-git clone https://github.com/your-org/omni-agent.git
+git clone https://github.com/beraising/omni-agent.git
 cd omni-agent/omni-agent-service
 ./mvnw spring-boot:run
 ```
@@ -170,7 +170,30 @@ cd omni-agent/omni-agent-service
 
 ---
 
-## 📄 License
+## 📌 版本约定
 
-Copyright © 2025 [Chongqing Beraising Technology Co., Ltd.](https://www.beraising.com)  
-This project is licensed under the [Apache License 2.0](LICENSE).
+当前阶段为 开发中，版本号使用 0.x.x（例如 v0.1.0）
+
+首个稳定版将从 v1.0.0 开始
+
+版本遵循 语义化版本规范 (SemVer)
+
+## 📄 License
+Copyright 2025 Chongqing Beraising Technology Co., Ltd.
+(重庆北睿星科技有限公司) www.beraising.com
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+
+本项目采用 Apache License 2.0
+ 协议开源。
+
+## 🌐 公司信息
+
+公司名称：重庆北睿星科技有限公司
+
+官网：www.beraising.com
