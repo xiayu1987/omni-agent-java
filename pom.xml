@@ -31,7 +31,7 @@
 
 	<properties>
 		<!-- Project revision -->
-		<revision>1.0-SNAPSHOT</revision>
+		<revision>0.1.0-SNAPSHOT</revision>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -47,7 +47,7 @@
 		<spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
 
 		<!-- Spring Boot -->
-		<spring-boot.version>3.5.4</spring-boot.version>
+		<spring-boot.version>3.5.5</spring-boot.version>
 
 		<!-- maven plugin -->
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
