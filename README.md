@@ -207,8 +207,7 @@ cd omni-agent/omni-agent-service
 版本遵循 语义化版本规范 (SemVer)
 
 ## 📄 License
-Copyright 2025 Chongqing Beraising Technology Co., Ltd.
-(重庆北睿星科技有限公司) www.beraising.com
+Copyright 2025 重庆北睿星科技有限公司 (www.beraising.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
