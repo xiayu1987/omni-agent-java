@@ -219,6 +219,9 @@ You may obtain a copy of the License at
 本项目采用 Apache License 2.0
  协议开源。
 
+本项目自 [2025-08-22] 起采用 [Apache License 2.0](./LICENSE) 开源发布。
+在此之前的提交未附带开源协议，但自本日期起所有代码均受该协议保护。
+
 ## 🌐 公司信息
 
 公司名称：重庆北睿星科技有限公司
