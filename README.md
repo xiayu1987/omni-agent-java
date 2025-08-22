@@ -36,18 +36,16 @@ Omni-Agent 采用“感知 - 决策 - 执行”的智能体三段式架构，整
 core/
 ├── agents       // 智能体定义与执行逻辑
 │   ├── OmniAgentEngine.java     // Agent 执行引擎
-│   ├── RouterAgent.java         // 路由代理器
-│   ├── FormAgent.java           // 表单处理 Agent
-│   └── ...                      // 其他垂类智能体
 │
 ├── context      // 上下文体系（Context）
 │   ├── IAgentStaticContext.java   // 静态上下文：注册表、会话管理器等
 │   ├── IAgentRuntimeContext.java  // 动态上下文：事件状态、工作流状态等
 │
 ├── event        // 感知事件建模
-│   ├── IAgentRequest.java         // 输入事件模型
-│   ├── IAgentResponse.java        // 输出事件模型
-│   ├── IEventListener.java        // 异步事件监听器接口
+│   ├── IAgentEvent.java           // 输入事件
+│   ├── IAgentRequest.java         // 输入事件请求
+│   ├── IAgentResponse.java        // 输出事件响应
+│   ├── IEventListener.java        // 事件监听器接口
 │
 ├── graph        // 工作流定义与编排引擎
 │   └── ...
@@ -174,4 +172,5 @@ cd omni-agent/omni-agent-service
 
 ## 📄 License
 
-MIT © beraising.com
+Copyright © 2025 [Chongqing Beraising Technology Co., Ltd.](https://www.beraising.com)  
+This project is licensed under the [Apache License 2.0](LICENSE).
