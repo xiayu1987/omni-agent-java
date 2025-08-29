@@ -8,7 +8,7 @@ spring:
 
   ai:
     dashscope:
-      api-key: sk-f03153e453304d70bdcc236c2993d4be
+      api-key: ${DASHSCOPE_API_KEY}
 
     mcp:
       client:

@@ -14,6 +14,7 @@ import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.edge.IGraphEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
 
 public interface IAgentGraph {
 
@@ -45,6 +46,10 @@ public interface IAgentGraph {
         List<IGraphEdge> getGraphEdges();
 
         IGraphState newGraphState();
+
+        <T extends IGraphState> void onGraphPartApplield(IGraphPart graphPart, IUpdatedGraphState<T> updatedGraphState,
+                        IGraphState graphState, IAgentRuntimeContext agentRuntimeContext,
+                        IAgentEvent agentEvent);
 
         default Map<String, Object> createInput(IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext) {
                 Map<String, Object> inputMap = new HashMap<>();

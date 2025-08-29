@@ -16,6 +16,7 @@
 
 package com.beraising.agent.omni.core.agents.impl;
 
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.agents.AgentRegistry;
@@ -35,11 +36,14 @@ import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.impl.AgentSessionItem;
 import com.google.gson.Gson;
 
+import reactor.core.publisher.Sinks;
+
 @Component
 public class OmniAgentEngine implements IAgentEngine {
 
     private final AgentRegistry agentRegistry;
     private final IAgentSessionManage agentSessionManage;
+    private final IAgentRuntimeContextBuilder agentRuntimeContextBuilder;
     private IEventListener eventListener;
 
     public OmniAgentEngine(AgentRegistry agentRegistry, IAgentSessionManage agentSessionManage,
@@ -47,7 +51,8 @@ public class OmniAgentEngine implements IAgentEngine {
         super();
         this.agentRegistry = agentRegistry;
         this.agentSessionManage = agentSessionManage;
-        this.eventListener = new EventListener(agentSessionManage, agentRuntimeContextBuilder);
+        this.agentRuntimeContextBuilder = agentRuntimeContextBuilder;
+        this.eventListener = new EventListener(this.agentSessionManage, this.agentRuntimeContextBuilder);
     }
 
     @Override
@@ -59,6 +64,7 @@ public class OmniAgentEngine implements IAgentEngine {
         if (agentSession == null) {
 
             currentAgent = this.agentRegistry.getRouterAgent();
+
         } else {
             String currentAgentName = agentSessionManage.getCurrentSessionItem(agentSession).getAgentName();
 
@@ -74,6 +80,7 @@ public class OmniAgentEngine implements IAgentEngine {
         eventListener.onStart(agent, agentEvent);
 
         agent.init(eventListener);
+
         IAgentEvent result = agent.invoke(agentEvent);
 
         IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
@@ -97,6 +104,11 @@ public class OmniAgentEngine implements IAgentEngine {
         @Override
         public void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                 Throwable throwable) {
+
+            if (agentRuntimeContext != null) {
+                agentRuntimeContext.setIsEnd(true);
+            }
+
             if (agentEvent != null) {
 
                 IAgentResponse agentResponse = AgentResponse.builder().responseType(EAgentResponseType.ERROR)
@@ -106,26 +118,13 @@ public class OmniAgentEngine implements IAgentEngine {
 
                 IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
 
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(agentEvent.getAgentRequest())
-                        .agentResponse(null)
-                        .build());
-
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(null)
-                        .agentResponse(agentResponse)
-                        .build());
+                endSession(agent, agentEvent, agentResponse, agentSession);
             }
 
-            if (agentRuntimeContext != null) {
-                agentRuntimeContext.setIsEnd(true);
-            }
         }
 
         @Override
-        public IAgentSession onStart(IAgent agent, IAgentEvent agentEvent) throws Exception {
+        public IAgentSession onStart(IAgent agent, IAgentEvent agentEvent) {
 
             IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
 
@@ -141,25 +140,55 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         @Override
-        public IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph)
-                throws Exception {
+        public void onInvokeStream(IAgent agent, IAgentEvent agentEvent,
+                IAgentRuntimeContext agentRuntimeContext, AgentGraphInvokeStreamContent content) {
 
-            IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
-            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            Sinks.Many<ServerSentEvent<IAgentEvent>> sseChanel = agentEvent.getSseChanel();
+
+            if (sseChanel == null || agentRuntimeContext.isEnd()) {
+                return;
+            }
+
+            if (content.isError()) {
+                onError(agent, agentEvent, agentRuntimeContext, new Exception(content.getContent()));
+                return;
+            } else if (!content.isComplete()) {
+
+                agentEvent.setAgentResponse(AgentResponse.builder().responseType(EAgentResponseType.TEXT)
+                        .responseData(content.getContent()).build());
+                sseChanel
+                        .tryEmitNext(ServerSentEvent.<IAgentEvent>builder().data(agentEvent).build());
+                return;
+            }
+
+        }
+
+        @Override
+        public IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph) {
             IAgentRuntimeContext result = null;
 
-            if (lastAgentRuntimeContext == null || lastAgentRuntimeContext.isEnd()
-                    || !agent.getName().equals(lastAgentRuntimeContext.getAgent().getName())
-                    || lastAgentRuntimeContext.getCompiledGraph() == null) {
-                result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
-                agentSessionManage.addAgentRuntimeContext(result);
+            try {
+                IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionID());
+                IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
 
-                if (lastAgentRuntimeContext != null) {
-                    lastAgentRuntimeContext.setIsEnd(true);
+                if (lastAgentRuntimeContext == null || lastAgentRuntimeContext.isEnd()
+                        || !agent.getName().equals(lastAgentRuntimeContext.getAgent().getName())
+                        || lastAgentRuntimeContext.getCompiledGraph() == null) {
+
+                    result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
+
+                    agentSessionManage.addAgentRuntimeContext(result);
+
+                    if (lastAgentRuntimeContext != null) {
+                        lastAgentRuntimeContext.setIsEnd(true);
+                    }
+                } else {
+                    result = lastAgentRuntimeContext;
+                    result.getAgentEvents().add(agentEvent);
                 }
-            } else {
-                result = lastAgentRuntimeContext;
-                result.getAgentEvents().add(agentEvent);
+
+            } catch (Exception e) {
+                onError(agent, agentEvent, result, e);
             }
 
             return result;
@@ -167,7 +196,7 @@ public class OmniAgentEngine implements IAgentEngine {
 
         @Override
         public void onComplete(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                IAgentResponse agentResponse) throws Exception {
+                IAgentResponse agentResponse) {
             if (agentRuntimeContext.isEnd()) {
                 return;
             }
@@ -180,23 +209,13 @@ public class OmniAgentEngine implements IAgentEngine {
                 IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
                 lastAgentEvent.setAgentResponse(agentResponse);
 
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(agentEvent.getAgentRequest())
-                        .agentResponse(null)
-                        .build());
-
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(null)
-                        .agentResponse(agentResponse)
-                        .build());
+                endSession(agent, agentEvent, agentResponse, agentSession);
             }
         }
 
         @Override
         public void onInterrupt(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                IAgentResponse agentResponse) throws Exception {
+                IAgentResponse agentResponse) {
             if (agentRuntimeContext.isEnd()) {
                 return;
             }
@@ -208,18 +227,31 @@ public class OmniAgentEngine implements IAgentEngine {
                 IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
                 lastAgentEvent.setAgentResponse(agentResponse);
 
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(agentEvent.getAgentRequest())
-                        .agentResponse(null)
-                        .build());
-
-                agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
-                        .agentName(agent.getName())
-                        .agentRequest(null)
-                        .agentResponse(agentResponse)
-                        .build());
+                endSession(agent, agentEvent, agentResponse, agentSession);
             }
         }
+
+        private void endSession(IAgent agent, IAgentEvent agentEvent, IAgentResponse agentResponse,
+                IAgentSession agentSession) {
+            agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                    .agentName(agent.getName())
+                    .agentRequest(agentEvent.getAgentRequest())
+                    .agentResponse(null)
+                    .build());
+
+            agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+                    .agentName(agent.getName())
+                    .agentRequest(null)
+                    .agentResponse(agentResponse)
+                    .build());
+
+            Sinks.Many<ServerSentEvent<IAgentEvent>> sseChanel = agentEvent.getSseChanel();
+            if (sseChanel != null) {
+                sseChanel.tryEmitComplete();
+                agentEvent.setSseChanel(null);
+            }
+        }
+
     }
+
 }
