@@ -113,7 +113,7 @@ public abstract class AgentBase implements IAgent {
                 try {
                     IAgentRuntimeContext agentRuntimeContext = AgentBase.this.getAgentStaticContext()
                             .getAgentSessionManage()
-                            .getAgentRuntimeContextById(
+                            .getAgentRuntimeContextById(state.get(IGraphState.getAgentSessionIDKey()).toString(),
                                     state.get(IGraphState.getAgentRuntimeContextIDKey()).toString());
 
                     agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());

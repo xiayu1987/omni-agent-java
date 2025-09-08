@@ -130,7 +130,6 @@ public class OmniAgentEngine implements IAgentEngine {
 
             if (agentSession == null) {
                 agentSession = agentSessionManage.createAgentSession();
-                agentSessionManage.addSession(agentSession);
             }
 
             agentEvent.setAgentSessionID(agentSession.getAgentSessionId());
@@ -177,7 +176,7 @@ public class OmniAgentEngine implements IAgentEngine {
 
                     result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
 
-                    agentSessionManage.addAgentRuntimeContext(result);
+                    agentSessionManage.addAgentRuntimeContext(agentSession, result);
 
                     if (lastAgentRuntimeContext != null) {
                         lastAgentRuntimeContext.setIsEnd(true);
@@ -233,16 +232,16 @@ public class OmniAgentEngine implements IAgentEngine {
 
         private void endSession(IAgent agent, IAgentEvent agentEvent, IAgentResponse agentResponse,
                 IAgentSession agentSession) {
-            agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+            this.agentSessionManage.addSessionItem(agentSession, AgentSessionItem.builder()
                     .agentName(agent.getName())
                     .agentRequest(agentEvent.getAgentRequest())
                     .agentResponse(null)
                     .build());
 
-            agentSession.getAgentSessionItems().add(AgentSessionItem.builder()
+            this.agentSessionManage.addSessionItem(agentSession, AgentSessionItem.builder()
                     .agentName(agent.getName())
                     .agentRequest(null)
-                    .agentResponse(agentResponse)
+                    .agentResponse(agentEvent.getAgentResponse())
                     .build());
 
             Sinks.Many<ServerSentEvent<IAgentEvent>> sseChanel = agentEvent.getSseChanel();

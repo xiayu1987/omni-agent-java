@@ -6,6 +6,11 @@ spring:
     name: omni-agent-service
 
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/agent?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 123456
+
   ai:
     dashscope:
       api-key: ${DASHSCOPE_API_KEY}
@@ -19,6 +24,12 @@ spring:
             server:
               # 实际的连接地址为：http://localhost:20004/sse/mcp
               url: http://localhost:20004/
+
+agent:
+  session:
+    storeType: db
+
+
 
     # openai:
     #   api-key: sk-fake-key

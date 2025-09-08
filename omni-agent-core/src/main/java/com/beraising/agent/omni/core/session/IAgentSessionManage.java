@@ -1,27 +1,19 @@
 package com.beraising.agent.omni.core.session;
 
-import java.util.List;
-
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
 public interface IAgentSessionManage {
 
-    List<IAgentSession> getAgentSessions();
-
     IAgentSession getAgentSessionById(String sessionId);
 
-    IAgentRuntimeContext getAgentRuntimeContextById(String runtimeContextId);
+    IAgentRuntimeContext getAgentRuntimeContextById(String sessionId, String runtimeContextId);
 
     IAgentSession createAgentSession();
 
     IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);
 
-    void addSession(IAgentSession agentSession);
-
     void addSessionItem(IAgentSession agentSession, IAgentSessionItem sessionItem);
 
-    void addAgentRuntimeContext(IAgentRuntimeContext runtimeContext);
-
-    void clearAllSessions();
+    void addAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext);
 
 }

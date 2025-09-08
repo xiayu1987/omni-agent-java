@@ -5,6 +5,7 @@ import org.springframework.http.codec.ServerSentEvent;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.event.IAgentResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class AgentEvent implements IAgentEvent {
     private IAgentResponse agentResponse;
     private String agentSessionID;
     private boolean isStream;
+    @JsonIgnore
     private transient Many<ServerSentEvent<IAgentEvent>> sseChanel;
 
     @Override

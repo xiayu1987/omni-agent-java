@@ -8,13 +8,18 @@ import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class AgentRuntimeContext implements IAgentRuntimeContext {
 
-    private IGraphState graphState;
     private List<IAgentEvent> agentEvents;
-    private IAgent agent;
-    private CompiledGraph compiledGraph;
+    @JsonIgnore
+    private transient IGraphState graphState;
+    @JsonIgnore
+    private transient IAgent agent;
+    @JsonIgnore
+    private transient CompiledGraph compiledGraph;
+    private String agentName;
     private String agentSessionID;
     private String agentRuntimeContextID;
 
@@ -72,6 +77,16 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     @Override
     public void setIsEnd(boolean isEnd) {
         this.isEnd = isEnd;
+    }
+
+    @Override
+    public String getAgentName() {
+        return agentName;
+    }
+
+    @Override
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 
     @Override
