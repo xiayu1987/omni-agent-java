@@ -1,7 +1,9 @@
 package com.beraising.agent.omni.core.session.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,12 @@ public class MemorySessionStore implements ISessionStore {
     @Override
     public IAgentSession selectById(String sessionId) {
         return store.get(sessionId);
+    }
+
+    @Override
+    public List<IAgentSession> selectByUserId(String userId) {
+        return store.values().stream().filter(session -> session.getUserId().equals(userId))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,9 +1,5 @@
 package com.beraising.agent.omni.core.event;
 
-import org.springframework.http.codec.ServerSentEvent;
-
-import reactor.core.publisher.Sinks;
-
 public interface IAgentEvent {
 
     IAgentRequest getAgentRequest();
@@ -14,17 +10,21 @@ public interface IAgentEvent {
 
     void setAgentResponse(IAgentResponse agentResponse);
 
-    String getAgentSessionID();
+    String getAgentSessionId();
 
-    void setAgentSessionID(String agentSessionID);
+    void setAgentSessionId(String agentSessionId);
+
+    String getUserId();
+
+    void setUserId(String userId);
 
     boolean isStream();
 
     void setStream(boolean stream);
 
-    void setSseChanel(Sinks.Many<ServerSentEvent<IAgentEvent>> sseChanel);
+    void setSseChanel(ISseChanel sseChanel);
 
-    Sinks.Many<ServerSentEvent<IAgentEvent>> getSseChanel();
+    ISseChanel getSseChanel();
 
     IAgentEvent copy();
 

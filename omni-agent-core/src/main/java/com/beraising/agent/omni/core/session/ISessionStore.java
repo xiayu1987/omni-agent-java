@@ -1,10 +1,14 @@
 package com.beraising.agent.omni.core.session;
 
+import java.util.List;
+
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 
 public interface ISessionStore {
 
     IAgentSession selectById(String sessionId);
+
+    List<IAgentSession> selectByUserId(String userId);
 
     void saveSession(IAgentSession session);
 

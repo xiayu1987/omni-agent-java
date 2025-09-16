@@ -53,8 +53,8 @@ public interface IAgentGraph {
 
         default Map<String, Object> createInput(IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext) {
                 Map<String, Object> inputMap = new HashMap<>();
-                inputMap.put(IGraphState.getAgentSessionIDKey(), agentRuntimeContext.getAgentSessionID());
-                inputMap.put(IGraphState.getAgentRuntimeContextIDKey(), agentRuntimeContext.getAgentRuntimeContextID());
+                inputMap.put(IGraphState.getAgentSessionIDKey(), agentRuntimeContext.getAgentSessionId());
+                inputMap.put(IGraphState.getAgentRuntimeContextIDKey(), agentRuntimeContext.getAgentRuntimeContextId());
                 putInput(inputMap, agentRuntimeContext, agentEvent);
                 return inputMap;
         }

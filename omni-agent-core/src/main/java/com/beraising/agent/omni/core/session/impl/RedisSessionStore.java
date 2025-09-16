@@ -1,9 +1,10 @@
 package com.beraising.agent.omni.core.session.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,48 @@ public class RedisSessionStore implements ISessionStore {
         }
 
         return session;
+    }
+
+    @Override
+    public List<IAgentSession> selectByUserId(String userId) {
+        // 1. 从 Redis 中查用户会话列表（假设 Redis 里有 userId -> List<sessionId> 的映射）
+        List<String> sessionIds = redisTemplate.opsForList().range(PREFIX + "user:" + userId, 0, -1);
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<IAgentSession> result = new ArrayList<>();
+
+        for (String sessionId : sessionIds) {
+            String json = redisTemplate.opsForValue().get(PREFIX + sessionId);
+            if (json == null) {
+                continue; // 缓存未命中，跳过或可选择去数据库补充
+            }
+
+            AgentSession session = JSON.parseObject(json, AgentSession.class);
+
+            // 读取 Items
+            List<String> itemJsons = redisTemplate.opsForList().range(PREFIX + sessionId + ":items", 0, -1);
+            if (itemJsons != null) {
+                List<IAgentSessionItem> items = itemJsons.stream()
+                        .map(s -> JSON.parseObject(s, AgentSessionItem.class))
+                        .collect(Collectors.toList());
+                session.setAgentSessionItems(items);
+            }
+
+            // 读取 Contexts
+            List<String> contextJsons = redisTemplate.opsForList().range(PREFIX + sessionId + ":contexts", 0, -1);
+            if (contextJsons != null) {
+                List<IAgentRuntimeContext> contexts = contextJsons.stream()
+                        .map(s -> JSON.parseObject(s, AgentRuntimeContext.class))
+                        .collect(Collectors.toList());
+                session.setAgentRuntimeContexts(contexts);
+            }
+
+            result.add(session);
+        }
+
+        return result;
     }
 
     @Override

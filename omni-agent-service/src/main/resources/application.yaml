@@ -74,3 +74,10 @@ logging:
     '[org.springframework.web.reactive.function.client.ExchangeFunctions]': TRACE
     '[org.springframework.ai.tool]': DEBUG
     '[org.springframework.ai.chat]': DEBUG
+
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

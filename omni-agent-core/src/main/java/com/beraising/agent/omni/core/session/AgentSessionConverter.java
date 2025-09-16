@@ -42,8 +42,9 @@ public class AgentSessionConverter {
 
         AgentSessionEntity entity = new AgentSessionEntity();
         entity.setSessionId(domain.getAgentSessionId());
-        entity.setUpdateTime(LocalDateTime.now());
-        entity.setCreateTime(LocalDateTime.now());
+        entity.setUserId(domain.getUserId());
+        // entity.setUpdateTime(LocalDateTime.now());
+        // entity.setCreateTime(LocalDateTime.now());
         return entity;
     }
 

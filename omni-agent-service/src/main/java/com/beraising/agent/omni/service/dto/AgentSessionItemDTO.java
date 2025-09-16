@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgentRequestDTO {
-    private int requestType;
-    private String requestData;
+public class AgentSessionItemDTO {
+
+    private AgentRequestDTO agentRequest;
+    private AgentResponseDTO agentResponse;
+    private String agentName;
+
 }

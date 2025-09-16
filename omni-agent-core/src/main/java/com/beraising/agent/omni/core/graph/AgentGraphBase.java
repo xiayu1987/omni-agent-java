@@ -105,7 +105,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
         }
 
         RunnableConfig runnableConfig = RunnableConfig.builder()
-                .threadId(agentRuntimeContext.getAgentRuntimeContextID())
+                .threadId(agentRuntimeContext.getAgentRuntimeContextId())
                 .build();
 
         IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());

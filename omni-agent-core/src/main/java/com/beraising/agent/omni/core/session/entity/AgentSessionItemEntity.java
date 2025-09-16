@@ -7,24 +7,28 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @TableName("t_agent_session_item")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AgentSessionItemEntity {
 
-    @TableId(value = "n_id", type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
-    @TableField("s_session_id")
+    @TableField()
     private String sessionId;
 
-    @TableField("s_item_data")
+    @TableField()
     private String itemData;
 
-    @TableField("t_update_time")
+    @TableField()
     private LocalDateTime updateTime;
 
-    @TableField("t_create_time")
+    @TableField()
     private LocalDateTime createTime;
 }

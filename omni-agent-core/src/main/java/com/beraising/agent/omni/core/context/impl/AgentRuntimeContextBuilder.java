@@ -30,13 +30,13 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
         if (agentEvent == null) {
             throw new IllegalArgumentException("Agent event cannot be null");
         }
-        if (agentEvent.getAgentSessionID() == null) {
+        if (agentEvent.getAgentSessionId() == null) {
             throw new IllegalArgumentException("Agent session ID cannot be null");
         }
 
         IAgentRuntimeContext agentRuntimeContext = new AgentRuntimeContext();
-        agentRuntimeContext.setAgentRuntimeContextID(UUID.randomUUID().toString());
-        agentRuntimeContext.setAgentSessionID(agentEvent.getAgentSessionID());
+        agentRuntimeContext.setAgentRuntimeContextId(UUID.randomUUID().toString());
+        agentRuntimeContext.setAgentSessionId(agentEvent.getAgentSessionId());
         agentRuntimeContext.setAgent(graph.getAgent());
         agentRuntimeContext.setIsEnd(false);
 

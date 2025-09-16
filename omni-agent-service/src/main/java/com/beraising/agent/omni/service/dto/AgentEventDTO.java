@@ -13,6 +13,7 @@ public class AgentEventDTO {
 
     private AgentRequestDTO agentRequest;
     private AgentResponseDTO agentResponse;
-    private String agentSessionID;
+    private String agentSessionId;
+    private String userId;
 
 }

@@ -20,30 +20,30 @@ public class TableInitializer {
     public void init() {
         jdbcTemplate.execute("""
                     CREATE TABLE IF NOT EXISTS t_agent_session (
-                        s_session_id VARCHAR(64) PRIMARY KEY,
-                        s_user_id VARCHAR(64),
-                        t_update_time DATETIME,
-                        t_create_time DATETIME
+                        session_id VARCHAR(64) PRIMARY KEY,
+                        user_id VARCHAR(64),
+                        update_time DATETIME,
+                        create_time DATETIME
                     )
                 """);
 
         jdbcTemplate.execute("""
                     CREATE TABLE IF NOT EXISTS t_agent_session_item (
-                        n_id BIGINT PRIMARY KEY,
-                        s_session_id VARCHAR(64),
-                        s_item_data TEXT,
-                        t_update_time DATETIME,
-                        t_create_time DATETIME
+                        id BIGINT PRIMARY KEY,
+                        session_id VARCHAR(64),
+                        item_data TEXT,
+                        update_time DATETIME,
+                        create_time DATETIME
                     )
                 """);
 
         jdbcTemplate.execute("""
                     CREATE TABLE IF NOT EXISTS t_agent_runtime_context (
-                        n_id BIGINT PRIMARY KEY,
-                        s_session_id VARCHAR(64),
-                        s_context_data TEXT,
-                        t_update_time DATETIME,
-                        t_create_time DATETIME
+                        id BIGINT PRIMARY KEY,
+                        session_id VARCHAR(64),
+                        context_data TEXT,
+                        update_time DATETIME,
+                        create_time DATETIME
                     )
                 """);
     }

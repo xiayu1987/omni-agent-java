@@ -10,6 +10,7 @@ import com.beraising.agent.omni.core.session.IAgentSessionItem;
 public class AgentSession implements IAgentSession {
 
     private String agentSessionId;
+    private String userId;
     private List<IAgentSessionItem> agentSessionItems;
     private List<IAgentRuntimeContext> agentRuntimeContexts;
 
@@ -27,6 +28,16 @@ public class AgentSession implements IAgentSession {
     @Override
     public void setAgentSessionId(String agentSessionId) {
         this.agentSessionId = agentSessionId;
+    }
+
+    @Override
+    public String getUserId() {
+        return userId;
+    }
+
+    @Override
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

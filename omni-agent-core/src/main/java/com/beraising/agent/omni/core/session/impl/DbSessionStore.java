@@ -1,5 +1,7 @@
 package com.beraising.agent.omni.core.session.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -67,6 +69,38 @@ public class DbSessionStore implements ISessionStore {
     }
 
     @Override
+    public List<IAgentSession> selectByUserId(String userId) {
+        // 先查数据库（这里一般不会走单条缓存，因为是批量查询）
+        List<AgentSessionEntity> sessionEntities = sessionMapper.findByUserId(userId);
+        if (sessionEntities == null || sessionEntities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<IAgentSession> result = new ArrayList<>();
+
+        for (AgentSessionEntity sessionEntity : sessionEntities) {
+            String sessionId = sessionEntity.getSessionId();
+
+            // 先查缓存
+            IAgentSession session = cache.getIfPresent(sessionId);
+            if (session == null) {
+                // 缓存未命中，查子表
+                List<AgentSessionItemEntity> items = itemMapper.findBySessionId(sessionId);
+                List<AgentRuntimeContextEntity> contexts = contextMapper.findBySessionId(sessionId);
+
+                session = AgentSessionConverter.toAggregate(sessionEntity, items, contexts);
+
+                // 写入缓存
+                cache.put(sessionId, session);
+            }
+
+            result.add(session);
+        }
+
+        return result;
+    }
+
+    @Override
     public void saveSession(IAgentSession session) {
         if (session == null) {
             return;
@@ -109,9 +143,9 @@ public class DbSessionStore implements ISessionStore {
         itemMapper.insertOrUpdate(entity);
 
         // 更新缓存
-        cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (k, v) -> {
-            v.getAgentSessionItems().add(sessionItem);
-            return v;
+        cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (key, value) -> {
+            value.getAgentSessionItems().add(sessionItem);
+            return value;
         });
     }
 
@@ -126,9 +160,9 @@ public class DbSessionStore implements ISessionStore {
         contextMapper.insertOrUpdate(entity);
 
         // 更新缓存
-        cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (k, v) -> {
-            v.getAgentRuntimeContexts().add(runtimeContext);
-            return v;
+        cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (key, value) -> {
+            value.getAgentRuntimeContexts().add(runtimeContext);
+            return value;
         });
     }
 }

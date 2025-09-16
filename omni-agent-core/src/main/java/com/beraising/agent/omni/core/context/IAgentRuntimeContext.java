@@ -25,13 +25,13 @@ public interface IAgentRuntimeContext extends IAgentContext {
 
     void setCompiledGraph(CompiledGraph compiledGraph);
 
-    String getAgentSessionID();
+    String getAgentSessionId();
 
-    void setAgentSessionID(String agentSessionID);
+    void setAgentSessionId(String agentSessionId);
 
-    String getAgentRuntimeContextID();
+    String getAgentRuntimeContextId();
 
-    void setAgentRuntimeContextID(String agentRuntimeContextID);
+    void setAgentRuntimeContextId(String agentRuntimeContextId);
 
     String getAgentName();
 

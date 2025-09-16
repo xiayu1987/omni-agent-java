@@ -20,6 +20,6 @@ public class InterruptNode<T extends IGraphState> extends GraphNodeBase<T> imple
         getGraph().getAgentGraphListener().onInterrupt(getGraph().getAgent(), agentEvent, agentRuntimeContext, this,
                 null);
 
-        return graphState.getUpdatedSessionID(agentEvent.getAgentSessionID());
+        return graphState.getUpdatedSessionID(agentEvent.getAgentSessionId());
     }
 }

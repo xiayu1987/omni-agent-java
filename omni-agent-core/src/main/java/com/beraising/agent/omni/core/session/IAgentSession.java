@@ -10,6 +10,10 @@ public interface IAgentSession {
 
     void setAgentSessionId(String agentSessionId);
 
+    String getUserId();
+
+    void setUserId(String userId);
+
     List<IAgentSessionItem> getAgentSessionItems();
 
     void setAgentSessionItems(List<IAgentSessionItem> agentSessionItems);

@@ -1,5 +1,6 @@
 package com.beraising.agent.omni.core.session.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,9 +49,15 @@ public class AgentSessionManage implements IAgentSessionManage {
     }
 
     @Override
-    public IAgentSession createAgentSession() {
+    public List<IAgentSession> getAgentSessionByUserId(String userId) {
+        return this.storage.selectByUserId(userId);
+    }
+
+    @Override
+    public IAgentSession createAgentSession(String userId) {
         IAgentSession newSession = new AgentSession();
         newSession.setAgentSessionId(UUID.randomUUID().toString());
+        newSession.setUserId(userId);
 
         this.storage.saveSession(newSession);
 
@@ -80,7 +87,7 @@ public class AgentSessionManage implements IAgentSessionManage {
     public IAgentRuntimeContext getAgentRuntimeContextById(String sessionId, String runtimeContextId) {
         IAgentSession agentSession = getAgentSessionById(sessionId);
         return agentSession.getAgentRuntimeContexts().stream()
-                .filter(agentRuntimeContext -> agentRuntimeContext.getAgentRuntimeContextID().equals(runtimeContextId))
+                .filter(agentRuntimeContext -> agentRuntimeContext.getAgentRuntimeContextId().equals(runtimeContextId))
                 .findFirst().orElse(null);
     }
 

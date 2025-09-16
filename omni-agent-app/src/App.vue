@@ -7,13 +7,18 @@ import ChatLayout from './components/ChatLayout.vue'
 
 const drawer = ref(false)
 const { isMobile } = useResponsive()
-</script>
 
-<style lang="css" scoped>
-.sidebar {
-  width: 260px;
+// 选中的会话 ID
+const selectedSessionId = ref<string | null>(null)
+
+// 处理会话选择
+function handleSessionSelect(id?: string) {
+  if (id) {
+    selectedSessionId.value = id
+  }
+  drawer.value = false
 }
-</style>
+</script>
 
 <template>
   <el-container class="full">
@@ -29,17 +34,17 @@ const { isMobile } = useResponsive()
     <el-container>
       <!-- 左侧会话（PC 显示） -->
       <el-aside v-if="!isMobile" class="sidebar">
-        <SessionSidebar />
+        <SessionSidebar @select="handleSessionSelect" />
       </el-aside>
 
       <!-- 移动端抽屉 -->
-      <el-drawer v-model="drawer" title="会话" direction="ltr" size="80%">
-        <SessionSidebar @select="drawer = false" />
+      <el-drawer class="sidebar" v-model="drawer" title="会话" direction="ltr" size="80%">
+        <SessionSidebar @select="handleSessionSelect" />
       </el-drawer>
 
       <!-- 主区域 -->
       <el-main class="main-panel">
-        <ChatLayout />
+        <ChatLayout :sessionId="selectedSessionId ?? ''" />
       </el-main>
     </el-container>
   </el-container>

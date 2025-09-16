@@ -20,8 +20,8 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     @JsonIgnore
     private transient CompiledGraph compiledGraph;
     private String agentName;
-    private String agentSessionID;
-    private String agentRuntimeContextID;
+    private String agentSessionId;
+    private String agentRuntimeContextId;
 
     private boolean isEnd;
 
@@ -90,23 +90,23 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     }
 
     @Override
-    public String getAgentSessionID() {
-        return agentSessionID;
+    public String getAgentSessionId() {
+        return agentSessionId;
     }
 
     @Override
-    public void setAgentSessionID(String agentSessionID) {
-        this.agentSessionID = agentSessionID;
+    public void setAgentSessionId(String agentSessionId) {
+        this.agentSessionId = agentSessionId;
     }
 
     @Override
-    public String getAgentRuntimeContextID() {
-        return agentRuntimeContextID;
+    public String getAgentRuntimeContextId() {
+        return agentRuntimeContextId;
     }
 
     @Override
-    public void setAgentRuntimeContextID(String agentRuntimeContextID) {
-        this.agentRuntimeContextID = agentRuntimeContextID;
+    public void setAgentRuntimeContextId(String agentRuntimeContextId) {
+        this.agentRuntimeContextId = agentRuntimeContextId;
     }
 
 }
