@@ -16,8 +16,6 @@
 
 package com.beraising.agent.omni.core.agents.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -119,7 +117,6 @@ public class OmniAgentEngine implements IAgentEngine {
             nextAgent.invoke(userEvent);
 
         } catch (Exception e) {
-            // 建议换成日志框架，比如 log.error("处理 Intent 完成事件失败", e);
             e.printStackTrace();
         }
     }
