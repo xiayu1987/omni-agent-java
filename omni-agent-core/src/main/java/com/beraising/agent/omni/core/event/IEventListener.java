@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 public interface IEventListener {
 
-        IAgentSession onStart(IAgent agent, IAgentEvent agentEvent);
+        IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent);
 
         IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph);
 

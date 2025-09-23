@@ -20,7 +20,13 @@ public class AgentSessionEntity {
     private String sessionId;
 
     @TableField()
+    private String parentSessionId;
+
+    @TableField()
     private String userId;
+
+    @TableField()
+    private int userType;
 
     @TableField()
     private LocalDateTime updateTime;

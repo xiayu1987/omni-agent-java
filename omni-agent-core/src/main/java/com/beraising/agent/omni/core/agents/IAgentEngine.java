@@ -9,6 +9,4 @@ public interface IAgentEngine {
 
     IAgentEvent invoke(IAgentEvent agentEvent) throws Exception;
 
-    IAgentEvent invoke(IAgent agent, IAgentEvent agentEvent) throws Exception;
-
 }

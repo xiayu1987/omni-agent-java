@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.ISessionStore;
@@ -54,10 +55,12 @@ public class AgentSessionManage implements IAgentSessionManage {
     }
 
     @Override
-    public IAgentSession createAgentSession(String userId) {
+    public IAgentSession createAgentSession(String parentSessionId, EUserType userType, String userId) {
         IAgentSession newSession = new AgentSession();
         newSession.setAgentSessionId(UUID.randomUUID().toString());
         newSession.setUserId(userId);
+        newSession.setUserType(userType);
+        newSession.setParentSessionId(parentSessionId);
 
         this.storage.saveSession(newSession);
 

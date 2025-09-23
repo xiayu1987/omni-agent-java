@@ -26,7 +26,7 @@ public interface IAgent {
 
     IAgentEvent invoke(IAgentEvent agentEvent) throws Exception;
 
-    FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
+    // FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
 
     @Builder
     @Data

@@ -1,9 +1,13 @@
 package com.beraising.agent.omni.core.agents;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+
+import com.beraising.agent.omni.core.agents.intent.IIntentAgent;
 
 @Component
 public class AgentRegistry {
@@ -29,6 +33,20 @@ public class AgentRegistry {
                 .filter(agent -> agent instanceof IRouterAgent)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public IIntentAgent getIntentAgent() {
+        return (IIntentAgent) agentMap.values().stream()
+                .filter(agent -> agent instanceof IIntentAgent)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<ICustomAgent> getAllCustomAgents() {
+        return agentMap.values().stream()
+                .filter(agent -> agent instanceof ICustomAgent)
+                .map(agent -> (ICustomAgent) agent)
+                .collect(Collectors.toList());
     }
 
     public Map<String, IAgent> getAgentMap() {

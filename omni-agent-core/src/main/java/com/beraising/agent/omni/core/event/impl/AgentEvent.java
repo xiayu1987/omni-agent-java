@@ -1,5 +1,6 @@
 package com.beraising.agent.omni.core.event.impl;
 
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.event.IAgentResponse;
@@ -20,8 +21,10 @@ public class AgentEvent implements IAgentEvent {
     private IAgentRequest agentRequest;
     private IAgentResponse agentResponse;
     private String agentSessionId;
+    private EUserType userType;
     private String userId;
     private boolean isStream;
+    private String responseFormat;
     @JsonIgnore
     private transient ISseChanel sseChanel;
 

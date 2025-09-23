@@ -3,6 +3,7 @@ package com.beraising.agent.omni.core.session;
 import java.util.List;
 
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EUserType;
 
 public interface IAgentSessionManage {
 
@@ -12,7 +13,7 @@ public interface IAgentSessionManage {
 
     IAgentRuntimeContext getAgentRuntimeContextById(String sessionId, String runtimeContextId);
 
-    IAgentSession createAgentSession(String userId);
+    IAgentSession createAgentSession(String parentSessionId, EUserType userType, String userId);
 
     IAgentSessionItem getCurrentSessionItem(IAgentSession agentSession);
 

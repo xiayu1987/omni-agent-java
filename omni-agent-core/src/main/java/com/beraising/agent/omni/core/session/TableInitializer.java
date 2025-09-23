@@ -21,7 +21,9 @@ public class TableInitializer {
         jdbcTemplate.execute("""
                     CREATE TABLE IF NOT EXISTS t_agent_session (
                         session_id VARCHAR(64) PRIMARY KEY,
+                        parent_session_id VARCHAR(64),
                         user_id VARCHAR(64),
+                        user_type INT,
                         update_time DATETIME,
                         create_time DATETIME
                     )

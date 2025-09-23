@@ -2,9 +2,11 @@ package com.beraising.agent.omni.core.session;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.impl.AgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.session.entity.AgentRuntimeContextEntity;
 import com.beraising.agent.omni.core.session.entity.AgentSessionEntity;
 import com.beraising.agent.omni.core.session.entity.AgentSessionItemEntity;
@@ -30,6 +32,9 @@ public class AgentSessionConverter {
 
         AgentSession session = new AgentSession();
         session.setAgentSessionId(entity.getSessionId());
+        session.setParentSessionId(entity.getParentSessionId());
+        session.setUserId(entity.getUserId());
+        session.setUserType(EUserType.fromCode(entity.getUserType()));
         session.setAgentSessionItems(items != null ? items : List.of());
         session.setAgentRuntimeContexts(contexts != null ? contexts : List.of());
 
@@ -42,9 +47,14 @@ public class AgentSessionConverter {
 
         AgentSessionEntity entity = new AgentSessionEntity();
         entity.setSessionId(domain.getAgentSessionId());
+        entity.setParentSessionId(domain.getParentSessionId());
         entity.setUserId(domain.getUserId());
-        // entity.setUpdateTime(LocalDateTime.now());
-        // entity.setCreateTime(LocalDateTime.now());
+        entity.setUserType(
+                Optional.ofNullable(domain.getUserType())
+                        .orElse(EUserType.USER) // 默认 USER
+                        .getCode());
+        entity.setUpdateTime(LocalDateTime.now());
+        entity.setCreateTime(LocalDateTime.now());
         return entity;
     }
 

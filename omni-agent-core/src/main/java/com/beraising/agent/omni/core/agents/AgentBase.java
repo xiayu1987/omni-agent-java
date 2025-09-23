@@ -48,30 +48,30 @@ public abstract class AgentBase implements IAgent {
         return agentEvent;
     }
 
-    @Override
-    public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent) {
-        return FunctionToolCallback.builder(
-                getName(), new Function<AsToolRequest, AsToolResponse>() {
-                    @Override
-                    public AsToolResponse apply(AsToolRequest request) {
-                        try {
-                            getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
-                                    agentEvent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return AsToolResponse.builder().isSuccess(false).message("未处理成功: " + e.getMessage())
-                                    .build();
-                        }
+    // @Override
+    // public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent) {
+    //     return FunctionToolCallback.builder(
+    //             getName(), new Function<AsToolRequest, AsToolResponse>() {
+    //                 @Override
+    //                 public AsToolResponse apply(AsToolRequest request) {
+    //                     try {
+    //                         getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
+    //                                 agentEvent);
+    //                     } catch (Exception e) {
+    //                         e.printStackTrace();
+    //                         return AsToolResponse.builder().isSuccess(false).message("未处理成功: " + e.getMessage())
+    //                                 .build();
+    //                     }
 
-                        return AsToolResponse.builder().isSuccess(true)
-                                .message("已交由" + getName() + "处理" + getDescription())
-                                .build();
-                    }
-                })
-                .description(getDescription())
-                .inputType(AsToolRequest.class)
-                .build();
-    }
+    //                     return AsToolResponse.builder().isSuccess(true)
+    //                             .message("已交由" + getName() + "处理" + getDescription())
+    //                             .build();
+    //                 }
+    //             })
+    //             .description(getDescription())
+    //             .inputType(AsToolRequest.class)
+    //             .build();
+    // }
 
     public class AgentGraphListener implements IAgentGraphListener {
 

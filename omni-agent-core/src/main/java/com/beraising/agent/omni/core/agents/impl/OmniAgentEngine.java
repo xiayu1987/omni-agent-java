@@ -16,25 +16,36 @@
 
 package com.beraising.agent.omni.core.agents.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.beraising.agent.omni.core.agents.AgentRegistry;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
+import com.beraising.agent.omni.core.agents.intent.IIntentAgent;
 import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
+import com.beraising.agent.omni.core.event.EAgentRequestType;
 import com.beraising.agent.omni.core.event.EAgentResponseType;
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.event.ISseChanel;
+import com.beraising.agent.omni.core.event.impl.AgentEvent;
+import com.beraising.agent.omni.core.event.impl.AgentRequest;
 import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.impl.AgentSessionItem;
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Component
 public class OmniAgentEngine implements IAgentEngine {
@@ -60,37 +71,103 @@ public class OmniAgentEngine implements IAgentEngine {
 
     @Override
     public IAgentEvent invoke(IAgentEvent agentEvent) throws Exception {
-        IAgentSession agentSession = agentSessionManage
-                .getAgentSessionById(agentEvent.getAgentSessionId());
-        IAgent currentAgent = null;
+        IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
+        AgentContext ctx = new AgentContext();
 
         if (agentSession == null) {
-
-            currentAgent = this.agentRegistry.getRouterAgent();
-
+            agentSession = eventListener.onStart(null, agentEvent);
         } else {
-            String currentAgentName = agentSessionManage.getCurrentSessionItem(agentSession).getAgentName();
-
-            currentAgent = this.agentRegistry.getAgentByName(currentAgentName);
+            ctx.lastContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            ctx.nextAgentName = agentSessionManage.getCurrentSessionItem(agentSession).getAgentName();
+            eventListener.onStart(null, agentEvent);
         }
 
-        return invoke(currentAgent, agentEvent);
+        IIntentAgent intentAgent = agentRegistry.getIntentAgent();
+        IAgentEvent intentEvent = createIntentEvent(agentEvent);
+        eventListener.onStart(agentSession, intentEvent);
+
+        intentAgent.init(new EventListener(agentSessionManage, agentRuntimeContextBuilder) {
+            @Override
+            public void onComplete(IAgent agent,
+                    IAgentEvent evt,
+                    IAgentRuntimeContext runtimeContext,
+                    IAgentResponse response) {
+                super.onComplete(agent, evt, runtimeContext, response);
+                handleIntentComplete(intentEvent, agentEvent, ctx.nextAgentName, ctx.lastContext);
+            }
+        });
+
+        intentAgent.invoke(intentEvent);
+        return agentEvent;
     }
 
-    @Override
-    public IAgentEvent invoke(IAgent agent, IAgentEvent agentEvent) throws Exception {
+    private void handleIntentComplete(IAgentEvent intentEvent,
+            IAgentEvent userEvent,
+            String nextAgentName,
+            IAgentRuntimeContext userContext) {
+        try {
+            JsonObject obj = JsonParser.parseString(intentEvent.getAgentResponse().getResponseData())
+                    .getAsJsonObject();
+            String nextIntentAgentName = obj.get("nextAgentName").getAsString();
 
-        eventListener.onStart(agent, agentEvent);
+            if (!Objects.equals(nextAgentName, nextIntentAgentName) && userContext != null) {
+                userContext.setIsEnd(true);
+            }
 
-        agent.init(eventListener);
+            IAgent nextAgent = agentRegistry.getAgentByName(nextIntentAgentName);
+            nextAgent.init(eventListener);
+            nextAgent.invoke(userEvent);
 
-        IAgentEvent result = agent.invoke(agentEvent);
+        } catch (Exception e) {
+            // 建议换成日志框架，比如 log.error("处理 Intent 完成事件失败", e);
+            e.printStackTrace();
+        }
+    }
 
-        IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
+    private IAgentEvent createIntentEvent(IAgentEvent userEvent) {
 
-        System.out.println("Agent Session Items: " + new Gson().toJson(agentSession.getAgentSessionItems()));
+        IAgentSession userSession = agentSessionManage
+                .getAgentSessionById(userEvent.getAgentSessionId());
 
-        return result;
+        IAgentRuntimeContext latestAgentRuntimeContext = null;
+
+        if (userSession == null) {
+
+        } else {
+            latestAgentRuntimeContext = ListUtils.lastOf(userSession.getAgentRuntimeContexts());
+
+        }
+
+        String chatContext = "";
+        if (latestAgentRuntimeContext != null && latestAgentRuntimeContext.isEnd() == false) {
+
+            chatContext = latestAgentRuntimeContext.getAgentEvents().stream()
+                    .map((item) -> {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("request:");
+                        sb.append(item.getAgentRequest().getRequestData());
+                        sb.append("response:");
+                        sb.append(item.getAgentResponse().getResponseData());
+
+                        return sb.toString();
+                    })
+                    .collect(Collectors.joining(", "));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("chatContext:");
+        sb.append(chatContext);
+        sb.append("request:");
+        sb.append(userEvent.getAgentRequest().getRequestData());
+
+        return AgentEvent.builder().userType(EUserType.SYSTEM)
+                .isStream(userEvent.isStream())
+                // .sseChanel(userEvent.getSseChanel())
+                .agentSessionId("")
+                .agentRequest(
+                        AgentRequest.builder().requestType(EAgentRequestType.TEXT)
+                                .requestData(sb.toString()).build())
+                .build();
     }
 
     public class EventListener implements IEventListener {
@@ -127,12 +204,17 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         @Override
-        public IAgentSession onStart(IAgent agent, IAgentEvent agentEvent) {
+        public IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent) {
 
             IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
 
             if (agentSession == null) {
-                agentSession = agentSessionManage.createAgentSession(agentEvent.getUserId());
+                String parentSessionId = null;
+                if (parentSession != null) {
+                    parentSessionId = parentSession.getAgentSessionId();
+                }
+                agentSession = agentSessionManage.createAgentSession(parentSessionId,
+                        agentEvent.getUserType(), agentEvent.getUserId());
             }
 
             agentEvent.setAgentSessionId(agentSession.getAgentSessionId());
@@ -254,6 +336,11 @@ public class OmniAgentEngine implements IAgentEngine {
             }
         }
 
+    }
+
+    class AgentContext {
+        String nextAgentName;
+        IAgentRuntimeContext lastContext;
     }
 
 }
