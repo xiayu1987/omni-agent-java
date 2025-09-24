@@ -34,14 +34,14 @@ public class IntentNode extends GraphNodeBase<IntentState> {
             return "{agent:" + agent.getName() + ": " + "description:" + agent.getDescription() + "}";
         }).collect(Collectors.joining(","));
 
-        SystemMessage systemMessageAgents = new SystemMessage(agents);
-        SystemMessage systemMessageRule = new SystemMessage(agentRuntimeContext.getAgent().getDescription());
+        SystemMessage systemMessageAgents = new SystemMessage("\r\n当前任务可用agent" + agents);
+        SystemMessage systemMessageRule = new SystemMessage(
+                "\r\n当前任务：" + agentRuntimeContext.getAgent().getDescription());
         SystemMessage systemMessageFormat = new SystemMessage(this.intentFormat);
-        UserMessage userMessage = new UserMessage(graphState.getUserInput());
+        UserMessage userMessage = new UserMessage("\r\n当前任务对话记录：" + graphState.getUserInput());
 
         Prompt prompt = new Prompt(List.of(systemMessageAgents, systemMessageRule, systemMessageFormat,
                 userMessage));
-        // Prompt prompt = new Prompt(List.of(userMessage));
 
         String content = getChatClient().prompt(prompt)
                 .call().content();

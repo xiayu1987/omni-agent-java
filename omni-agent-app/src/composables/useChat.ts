@@ -1,5 +1,5 @@
 import { uid } from '../utils/uid'
-import type { Message } from '../types/types'
+import type { Message, AgentEventDTO } from '../types/types'
 import { userStore } from '../composables/useUser'
 
 const API_URL = '/agent/api'
@@ -7,18 +7,17 @@ const API_URL = '/agent/api'
 /** 定义事件类型 */
 export interface ChatEvents {
     start: (userMsg: Message, botMsg: Message) => void
+    session: (sessionId: string) => void
     chunk: (text: string, botMsg: Message) => void
     done: (botMsg: Message) => void
     error: (err: Error) => void
 }
 
-// 通用事件总线（不对 Events 做 Record<...> 索引签名约束）
+// 通用事件总线
 export function createEventBus<Events>() {
-    // listeners 的类型：每个事件名对应一个回调数组（可选）
     const listeners: Partial<{ [K in keyof Events]: Events[K][] }> = {}
 
     function on<K extends keyof Events>(event: K, handler: Events[K]) {
-        // 取到当前数组或初始化一个空数组（需要类型断言以满足 TS）
         const arr = (listeners[event] as Events[K][] | undefined) || []
         arr.push(handler)
         listeners[event] = arr
@@ -28,14 +27,9 @@ export function createEventBus<Events>() {
         listeners[event] = ((listeners[event] as Events[K][] | undefined) || []).filter(h => h !== handler) as Events[K][]
     }
 
-    function emit<K extends keyof Events>(
-        event: K,
-        // 从 Events[K] 中提取参数元组（如果不是函数则为 never）
-        ...args: Events[K] extends (...args: infer P) => any ? P : never
-    ) {
+    function emit<K extends keyof Events>(event: K, ...args: Events[K] extends (...args: infer P) => any ? P : never) {
         const arr = listeners[event] as (Events[K] extends (...args: any[]) => any ? Events[K][] : undefined)
         if (!arr) return
-            // 强制把每个 handler 当作 any 函数来调用（已由类型系统在 emit 的签名处保证参数类型）
             ; (arr as unknown as ((...a: any[]) => any)[]).forEach(fn => fn(...(args as any)))
     }
 
@@ -54,19 +48,32 @@ export function useChat() {
 
         bus.emit('start', userMsg, botMsg)
 
+        abortController?.abort()
+        abortController = new AbortController()
+
         try {
-            abortController?.abort()
-            abortController = new AbortController()
+            const eventPayload: AgentEventDTO = {
+                agentRequest: {
+                    requestType: 0,
+                    requestData: text.trim(),
+                    createTime: new Date().toISOString(),
+                    editTime: new Date().toISOString()
+
+                },
+                agentResponse: {
+                    responseType: 0,
+                    responseData: '',
+                    createTime: new Date().toISOString(),
+                    editedAt: new Date().toISOString()
+                },
+                agentSessionId: sessionId,
+                userId: userStore.getUserId()
+            }
 
             const res = await fetch(`${API_URL}/invoke`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    agentRequest: { requestType: 0, requestData: text.trim() },
-                    agentResponse: { responseType: 0, responseData: "" },
-                    agentSessionId: sessionId,
-                    userId: userStore.getUserId()
-                }),
+                body: JSON.stringify(eventPayload),
                 signal: abortController.signal
             })
 
@@ -75,18 +82,56 @@ export function useChat() {
             const reader = res.body.getReader()
             const decoder = new TextDecoder()
             let buffer = ''
+            const gotSession = { value: false }
+
+            const processBuffer = (buf: string) => {
+                const lines = buf.split(/\r?\n/)
+                let remainder = ''
+                for (let line of lines) {
+                    line = line.trim()
+                    if (!line) continue
+                    if (line.startsWith('data:')) {
+                        const payload = line.slice(5).trim()
+                        if (payload === '[DONE]') continue
+                        const parsed = parseSSEChunk(payload)
+                        if (!parsed) {
+                            remainder += payload
+                            continue
+                        }
+
+                        if (parsed.sessionId && !gotSession.value) {
+                            gotSession.value = true
+                            bus.emit('session', parsed.sessionId)
+                        }
+
+                        if (parsed.text) {
+                            botMsg.content += parsed.text
+                            bus.emit('chunk', parsed.text, botMsg)
+                        }
+                    } else {
+                        remainder += line
+                    }
+                }
+                return remainder
+            }
 
             while (true) {
                 const { done, value } = await reader.read()
-                if (done) break
-
+                if (done) {
+                    buffer += decoder.decode()
+                    break
+                }
                 buffer += decoder.decode(value, { stream: true })
-                buffer = handleResponseData(buffer, botMsg, bus)
+                buffer = processBuffer(buffer)
             }
 
+            // flush 剩余 buffer
             if (buffer.trim()) {
-                botMsg.content += buffer
-                bus.emit('chunk', buffer, botMsg)
+                buffer = processBuffer(buffer)
+                if (buffer.trim()) {
+                    botMsg.content += buffer.trim()
+                    bus.emit('chunk', buffer.trim(), botMsg)
+                }
             }
 
             bus.emit('done', botMsg)
@@ -104,19 +149,18 @@ export function useChat() {
     return { send, stop, on: bus.on, off: bus.off }
 }
 
-/** SSE 数据处理 */
-function handleResponseData(buffer: string, botMsg: Message, bus: ReturnType<typeof createEventBus<ChatEvents>>): string {
+/** SSE JSON 解析，匹配 AgentEventDTO 中的 agentSessionId/text */
+function parseSSEChunk(raw: string): { text?: string; sessionId?: string } | null {
     try {
-        const regex = /^data:(.*)$/gm
-        let match: RegExpExecArray | null
-        while ((match = regex.exec(buffer))) {
-            const text = match[1].trim()
-            botMsg.content += text
-            bus.emit('chunk', text, botMsg)
+        const obj: AgentEventDTO = JSON.parse(raw)
+
+        return {
+            // 第一帧获取 sessionId
+            sessionId: obj.agentSessionId,
+            // 文本内容来自 agentResponse.responseData
+            text: obj.agentResponse?.responseData
         }
-        return ''
-    } catch (err) {
-        bus.emit('error', err instanceof Error ? err : new Error(String(err)))
-        return buffer
+    } catch {
+        return null
     }
 }

@@ -15,7 +15,8 @@ export interface Message {
 export interface Session {
     id: string
     title: string
-    createdAt: number
+    createTime: string
+    editTime: string
     messages: Message[]
 }
 
@@ -24,11 +25,15 @@ export interface Session {
 export interface AgentRequestDTO {
     requestType: number
     requestData: string
+    createTime: string
+    editTime: string
 }
 
 export interface AgentResponseDTO {
     responseType: number
     responseData: string
+    createTime: string
+    editedAt: string
 }
 
 export interface AgentSessionItemDTO {
@@ -41,6 +46,8 @@ export interface AgentSessionDTO {
     agentSessionId: string
     userId: string
     agentSessionItems: AgentSessionItemDTO[]
+    editTime: string
+    createTime: string
 }
 
 
@@ -60,7 +67,8 @@ export function convertAgentSessionToSession(dto: AgentSessionDTO): Session {
     return {
         id: dto.agentSessionId,
         title: dto.agentSessionItems?.[0]?.agentRequest.requestData || `会话 ${dto.agentSessionId.slice(0, 6)}`, // 优先取 requestData，没值才用默认
-        createdAt: Date.now(), // 后端没给 createdAt，就用当前时间
+        createTime: dto.createTime ?? new Date().toISOString(),
+        editTime: dto.editTime ?? new Date().toISOString(),
         messages: convertItemsToMessages(dto.agentSessionItems) // 补充 messages 字段
     }
 }

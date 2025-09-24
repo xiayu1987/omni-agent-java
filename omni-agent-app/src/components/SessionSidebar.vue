@@ -3,12 +3,17 @@ import { ref, onMounted } from 'vue'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import {
   getState,
+  setCurrentSession,
   loadSessions,
+  addNewSession,
   renameSession,
   deleteSession
 } from '../composables/useSession'
 
 const emit = defineEmits<{ (e: 'select', id?: string): void }>()
+defineExpose({
+  updateSession
+})
 
 // 本地状态
 const renamingId = ref<string | null>(null)
@@ -38,21 +43,30 @@ async function confirmRename() {
 
 // 选择会话
 async function handleSelect(id: string) {
+  setCurrentSession(id);
   emit('select', id)
 }
 
 // 新建会话
 async function handleNewSession() {
-  // 可在 useSession 添加 newSession 方法
-  // await newSession(userStore.getUserId())
-  // sessionState = getState()
+  addNewSession()
+  sessionState.value = getState()
 }
+
+async function updateSession(id: string) {
+  await loadSessions()
+  setCurrentSession(id);
+  sessionState.value = getState()
+}
+
 </script>
 
 
 <style lang="css" scoped>
 .el-menu {
   background-color: transparent;
+
+
 
   .el-menu-item {
     color: white;
@@ -77,6 +91,10 @@ async function handleNewSession() {
         margin: 0px;
       }
     }
+  }
+
+  .el-menu-item.is-active {
+    background-color: #232323;
   }
 
   .el-menu-item:hover {

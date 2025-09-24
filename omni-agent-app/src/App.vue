@@ -5,6 +5,7 @@ import { useResponsive } from './composables/useResponsive'
 import SessionSidebar from './components/SessionSidebar.vue'
 import ChatLayout from './components/ChatLayout.vue'
 
+const sessionSidebar = ref<InstanceType<typeof SessionSidebar> | null>(null)
 const drawer = ref(false)
 const { isMobile } = useResponsive()
 
@@ -17,6 +18,10 @@ function handleSessionSelect(id?: string) {
     selectedSessionId.value = id
   }
   drawer.value = false
+}
+
+function handleAddNewSession(id?: string) {
+  sessionSidebar.value?.updateSession(id ?? "")
 }
 </script>
 
@@ -34,17 +39,17 @@ function handleSessionSelect(id?: string) {
     <el-container>
       <!-- 左侧会话（PC 显示） -->
       <el-aside v-if="!isMobile" class="sidebar">
-        <SessionSidebar @select="handleSessionSelect" />
+        <SessionSidebar ref="sessionSidebar" @select="handleSessionSelect" />
       </el-aside>
 
       <!-- 移动端抽屉 -->
       <el-drawer class="sidebar" v-model="drawer" title="会话" direction="ltr" size="80%">
-        <SessionSidebar @select="handleSessionSelect" />
+        <SessionSidebar ref="sessionSidebar" @select="handleSessionSelect" />
       </el-drawer>
 
       <!-- 主区域 -->
       <el-main class="main-panel">
-        <ChatLayout :sessionId="selectedSessionId ?? ''" />
+        <ChatLayout @addNewSession="handleAddNewSession" :sessionId="selectedSessionId ?? ''" />
       </el-main>
     </el-container>
   </el-container>

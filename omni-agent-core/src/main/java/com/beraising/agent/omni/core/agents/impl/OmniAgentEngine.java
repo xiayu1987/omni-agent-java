@@ -132,7 +132,6 @@ public class OmniAgentEngine implements IAgentEngine {
 
         } else {
             latestAgentRuntimeContext = ListUtils.lastOf(userSession.getAgentRuntimeContexts());
-
         }
 
         String chatContext = "";
@@ -141,9 +140,9 @@ public class OmniAgentEngine implements IAgentEngine {
             chatContext = latestAgentRuntimeContext.getAgentEvents().stream()
                     .map((item) -> {
                         StringBuilder sb = new StringBuilder();
-                        sb.append("request:");
+                        sb.append("\r\n请求 request:\r\n");
                         sb.append(item.getAgentRequest().getRequestData());
-                        sb.append("response:");
+                        sb.append("\r\n响应 response:\r\n");
                         sb.append(item.getAgentResponse().getResponseData());
 
                         return sb.toString();
@@ -152,9 +151,9 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("chatContext:");
+        sb.append("\r\n之前聊天记录 chatContext:\r\n");
         sb.append(chatContext);
-        sb.append("request:");
+        sb.append("\r\n当前最新请求 request:\r\n");
         sb.append(userEvent.getAgentRequest().getRequestData());
 
         return AgentEvent.builder().userType(EUserType.SYSTEM)
@@ -226,7 +225,7 @@ public class OmniAgentEngine implements IAgentEngine {
 
             ISseChanel sseChanel = agentEvent.getSseChanel();
 
-            if (sseChanel == null || agentRuntimeContext.isEnd()) {
+            if (agentRuntimeContext.isEnd()) {
                 return;
             }
 
@@ -237,8 +236,11 @@ public class OmniAgentEngine implements IAgentEngine {
 
                 agentEvent.setAgentResponse(AgentResponse.builder().responseType(EAgentResponseType.TEXT)
                         .responseData(content.getContent()).build());
-                sseChanel
-                        .tryEmitNext(agentEvent);
+                if (sseChanel != null) {
+                    sseChanel
+                            .tryEmitNext(agentEvent);
+                }
+
                 return;
             }
 
@@ -327,9 +329,9 @@ public class OmniAgentEngine implements IAgentEngine {
                     .build());
 
             ISseChanel sseChanel = agentEvent.getSseChanel();
-            if (sseChanel != null) {
+            if (sseChanel != null
+                    && (agentSession.getParentSessionId() == null || agentSession.getParentSessionId().isEmpty())) {
                 sseChanel.tryEmitComplete();
-                agentEvent.setSseChanel(null);
             }
         }
 
