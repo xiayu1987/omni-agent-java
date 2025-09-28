@@ -38,6 +38,9 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
         agentRuntimeContext.setAgentRuntimeContextId(UUID.randomUUID().toString());
         agentRuntimeContext.setAgentSessionId(agentEvent.getAgentSessionId());
         agentRuntimeContext.setAgent(graph.getAgent());
+        if (graph.getAgent() != null) {
+            agentRuntimeContext.setAgentName(graph.getAgent().getName());
+        }
         agentRuntimeContext.setIsEnd(false);
 
         IGraphState graphState = graph.newGraphState();

@@ -94,7 +94,6 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
         this.agent = agent;
         this.agentGraphListener = agentGraphListener;
         this.eventListener = eventListener;
-
     }
 
     @Override
@@ -175,16 +174,14 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
                     eventListener.onError(agent, agentEvent, agentRuntimeContext, e);
                 }
 
-            }).thenAccept(v -> {
+            }).thenAccept(args -> {
 
                 eventListener.onInvokeStream(agent, agentEvent, agentRuntimeContext,
                         AgentGraphInvokeStreamContent.builder().isComplete(true).isError(false)
                                 .build());
 
-            }).exceptionally(e -> {
-                eventListener.onInvokeStream(agent, agentEvent, agentRuntimeContext,
-                        AgentGraphInvokeStreamContent.builder().isComplete(false).isError(true)
-                                .build());
+            }).exceptionally(exception -> {
+                eventListener.onError(agent, agentEvent, agentRuntimeContext, exception);
                 return null;
             });
         });

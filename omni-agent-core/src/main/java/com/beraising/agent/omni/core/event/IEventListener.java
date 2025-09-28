@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 
 public interface IEventListener {
 
-        IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent);
+        IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent) throws Exception;
 
-        IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph);
+        IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph)
+                        throws Exception;
 
         void onInvokeStream(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                         AgentGraphInvokeStreamContent content);

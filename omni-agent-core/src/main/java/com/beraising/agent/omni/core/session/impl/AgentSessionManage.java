@@ -87,6 +87,13 @@ public class AgentSessionManage implements IAgentSessionManage {
     }
 
     @Override
+    public void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext) {
+        if (agentSession != null && runtimeContext != null) {
+            this.storage.updateAgentRuntimeContext(agentSession, runtimeContext);
+        }
+    }
+
+    @Override
     public IAgentRuntimeContext getAgentRuntimeContextById(String sessionId, String runtimeContextId) {
         IAgentSession agentSession = getAgentSessionById(sessionId);
         return agentSession.getAgentRuntimeContexts().stream()

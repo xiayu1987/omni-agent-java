@@ -87,7 +87,6 @@ watch(() => messages.value.length, () => nextTick(scrollToBottom))
 onMounted(scrollToBottom)
 
 function handleSend(text: string) {
-  debugger
   chat.send(text, getState().currentId ?? "")
 }
 </script>

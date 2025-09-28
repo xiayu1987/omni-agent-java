@@ -21,4 +21,6 @@ public interface IAgentSessionManage {
 
     void addAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext);
 
+    void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext);
+
 }

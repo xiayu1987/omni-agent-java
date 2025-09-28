@@ -6,6 +6,7 @@ import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.ISseChanel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AgentEvent implements IAgentEvent {
 
+    @JsonDeserialize(as = AgentRequest.class)
     private IAgentRequest agentRequest;
+    @JsonDeserialize(as = AgentResponse.class)
     private IAgentResponse agentResponse;
     private String agentSessionId;
     private EUserType userType;
@@ -37,6 +40,7 @@ public class AgentEvent implements IAgentEvent {
         copy.setUserId(userId);
         copy.setStream(isStream);
         copy.setSseChanel(sseChanel);
+        copy.setUserType(userType);
         return copy;
     }
 

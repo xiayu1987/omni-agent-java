@@ -36,17 +36,20 @@ public class AgentStaticContext implements IAgentStaticContext {
         this.graphSaverConfig = SaverConfig.builder().register(SaverConstant.MEMORY, new MemorySaver()).build();
         this.agentSessionManage = agentSessionManage;
 
+        // this.chatClientBuilder
+        // .defaultAdvisors(MessageChatMemoryAdvisor.builder(
+
+        // MessageWindowChatMemory.builder()
+        // .chatMemoryRepository(this.memoryRepository)
+        // .maxMessages(MAX_MESSAGES)
+        // .build()
+
+        // )
+        // .build(),
+        // new SimpleLoggerAdvisor());
+
         this.chatClientBuilder
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(
-
-                        MessageWindowChatMemory.builder()
-                                .chatMemoryRepository(this.memoryRepository)
-                                .maxMessages(MAX_MESSAGES)
-                                .build()
-
-                )
-                        .build(),
-                        new SimpleLoggerAdvisor());
+                .defaultAdvisors(new SimpleLoggerAdvisor());
     }
 
     @Override

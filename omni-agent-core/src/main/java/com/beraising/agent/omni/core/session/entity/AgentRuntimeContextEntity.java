@@ -2,7 +2,6 @@ package com.beraising.agent.omni.core.session.entity;
 
 import java.time.LocalDateTime;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -17,8 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AgentRuntimeContextEntity {
 
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    @TableId()
+    private String id;
 
     @TableField()
     private String sessionId;

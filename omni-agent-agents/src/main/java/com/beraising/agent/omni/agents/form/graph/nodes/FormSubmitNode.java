@@ -33,11 +33,11 @@ public class FormSubmitNode extends GraphNodeBase<FormState> {
     public IUpdatedGraphState<FormState> apply(FormState graphState, IAgentRuntimeContext agentRuntimeContext,
             IAgentEvent agentEvent) throws Exception {
 
-        SystemMessage systemMessageRule = new SystemMessage("1.只通过工具提交");
-        SystemMessage systemMessageStep = new SystemMessage("当前任务提交表单");
+        SystemMessage systemMessageRule = new SystemMessage("/r/n1.只通过工具提交");
+        SystemMessage systemMessageStep = new SystemMessage("/r/n当前任务提交表单数据");
         SystemMessage systemMessageOutputFormat = new SystemMessage(this.formSubmitFormat);
         SystemMessage systemMessageInputFormat = new SystemMessage(
-                "按表单字段将用户数据构成json数据提供给工具:" + graphState.getFormGetResult());
+                "/r/n按表单字段将用户数据构成json数据提供给工具:" + graphState.getFormGetResult());
         UserMessage userMessage = new UserMessage(new Gson().toJson(agentRuntimeContext.getAgentEvents().stream()
                 .map(item -> item.getAgentRequest().getRequestData())
                 .collect(Collectors.toList())));

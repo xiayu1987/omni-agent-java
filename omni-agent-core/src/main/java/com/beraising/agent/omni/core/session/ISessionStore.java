@@ -16,5 +16,7 @@ public interface ISessionStore {
 
     void addAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext);
 
+    void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext);
+
     void delete(String sessionId);
 }

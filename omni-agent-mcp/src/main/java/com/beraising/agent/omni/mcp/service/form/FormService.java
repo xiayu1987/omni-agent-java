@@ -51,6 +51,7 @@ public class FormService {
             SUBMITCOUNT = 0;
             return "{\r\n" + //
                     "  \"isSuccess\": true,\r\n" + //
+                    "  \"message\": \"提交成功\"\r\n" + //
                     "}";
         }
 

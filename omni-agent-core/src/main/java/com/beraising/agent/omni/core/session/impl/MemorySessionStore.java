@@ -53,4 +53,9 @@ public class MemorySessionStore implements ISessionStore {
         agentSession.getAgentRuntimeContexts().add(runtimeContext);
     }
 
+    @Override
+    public void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext) {
+        
+    }
+
 }

@@ -101,6 +101,7 @@ public class AgentSessionConverter {
             return null;
 
         AgentRuntimeContextEntity entity = new AgentRuntimeContextEntity();
+        entity.setId(domain.getAgentRuntimeContextId());
         entity.setSessionId(sessionId);
         entity.setUpdateTime(LocalDateTime.now());
         entity.setCreateTime(LocalDateTime.now());

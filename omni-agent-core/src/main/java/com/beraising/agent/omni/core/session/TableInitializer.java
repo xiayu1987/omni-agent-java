@@ -41,7 +41,7 @@ public class TableInitializer {
 
         jdbcTemplate.execute("""
                     CREATE TABLE IF NOT EXISTS t_agent_runtime_context (
-                        id BIGINT PRIMARY KEY,
+                        id VARCHAR(64) PRIMARY KEY,
                         session_id VARCHAR(64),
                         context_data TEXT,
                         update_time DATETIME,

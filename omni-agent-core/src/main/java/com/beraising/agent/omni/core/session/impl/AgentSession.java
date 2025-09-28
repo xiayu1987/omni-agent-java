@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.context.impl.AgentRuntimeContext;
 import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionItem;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.Data;
 
@@ -17,7 +19,11 @@ public class AgentSession implements IAgentSession {
     private String parentSessionId;
     private EUserType userType = EUserType.USER;
     private String userId;
+
+    @JsonDeserialize(contentAs = AgentSessionItem.class)
     private List<IAgentSessionItem> agentSessionItems;
+
+    @JsonDeserialize(contentAs = AgentRuntimeContext.class)
     private List<IAgentRuntimeContext> agentRuntimeContexts;
 
     public AgentSession() {

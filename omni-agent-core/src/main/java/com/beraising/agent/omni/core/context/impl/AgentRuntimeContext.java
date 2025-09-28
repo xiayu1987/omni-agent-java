@@ -7,11 +7,15 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.event.impl.AgentEvent;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public class AgentRuntimeContext implements IAgentRuntimeContext {
 
+    @JsonDeserialize(contentAs = AgentEvent.class)
     private List<IAgentEvent> agentEvents;
     @JsonIgnore
     private transient IGraphState graphState;
@@ -23,6 +27,7 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     private String agentSessionId;
     private String agentRuntimeContextId;
 
+    @JsonProperty("end")
     private boolean isEnd;
 
     public AgentRuntimeContext() {

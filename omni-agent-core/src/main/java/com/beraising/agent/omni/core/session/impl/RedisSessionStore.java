@@ -147,10 +147,17 @@ public class RedisSessionStore implements ISessionStore {
 
     @Override
     public void addAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext) {
-        if (agentSession == null || runtimeContext == null)
+        if (agentSession == null || runtimeContext == null) {
             return;
-
+        }
         String key = PREFIX + agentSession.getAgentSessionId() + ":contexts";
-        redisTemplate.opsForList().rightPush(key, JSON.toJSONString(runtimeContext));
+        redisTemplate.opsForHash().put(key, runtimeContext.getAgentRuntimeContextId(),
+                JSON.toJSONString(runtimeContext));
+    }
+
+    @Override
+    public void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext) {
+        // Hash 的 put 本身就是新增/覆盖，所以 add 和 update 可以复用
+        addAgentRuntimeContext(agentSession, runtimeContext);
     }
 }

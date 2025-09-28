@@ -3,6 +3,7 @@ package com.beraising.agent.omni.core.session.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -157,11 +158,41 @@ public class DbSessionStore implements ISessionStore {
 
         AgentRuntimeContextEntity entity = AgentSessionConverter.toEntity(agentSession.getAgentSessionId(),
                 runtimeContext);
-        contextMapper.insertOrUpdate(entity);
+        contextMapper.insert(entity);
 
         // 更新缓存
         cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (key, value) -> {
             value.getAgentRuntimeContexts().add(runtimeContext);
+            return value;
+        });
+    }
+
+    @Override
+    public void updateAgentRuntimeContext(IAgentSession agentSession, IAgentRuntimeContext runtimeContext) {
+        if (agentSession == null || runtimeContext == null) {
+            return;
+        }
+
+        // 先更新数据库
+        AgentRuntimeContextEntity entity = AgentSessionConverter.toEntity(
+                agentSession.getAgentSessionId(),
+                runtimeContext);
+        contextMapper.updateById(entity);
+
+        // 再更新缓存，保持和 DB 一致
+        cache.asMap().computeIfPresent(agentSession.getAgentSessionId(), (key, value) -> {
+            List<IAgentRuntimeContext> contexts = value.getAgentRuntimeContexts();
+            if (contexts != null) {
+                // 根据唯一 ID 定位并替换
+                for (int i = 0; i < contexts.size(); i++) {
+                    if (Objects.equals(
+                            contexts.get(i).getAgentRuntimeContextId(),
+                            runtimeContext.getAgentRuntimeContextId())) {
+                        contexts.set(i, runtimeContext);
+                        return value;
+                    }
+                }
+            }
             return value;
         });
     }

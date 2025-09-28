@@ -36,7 +36,7 @@ public class IntentNode extends GraphNodeBase<IntentState> {
 
         SystemMessage systemMessageAgents = new SystemMessage("\r\n当前任务可用agent" + agents);
         SystemMessage systemMessageRule = new SystemMessage(
-                "\r\n当前任务：" + agentRuntimeContext.getAgent().getDescription());
+                "\r\n当前任务：" + agentRuntimeContext.getAgent().getDescription() + "\r\n根据对话识别改由什么agent开始或继续任务,并给出agent名称");
         SystemMessage systemMessageFormat = new SystemMessage(this.intentFormat);
         UserMessage userMessage = new UserMessage("\r\n当前任务对话记录：" + graphState.getUserInput());
 

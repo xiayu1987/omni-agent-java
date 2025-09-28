@@ -109,6 +109,7 @@ public class OmniAgentController {
         } catch (Exception e) {
 
             e.printStackTrace();
+            sink.tryEmitError(e);
         }
         // ServerSentEvent.<IAgentEvent>builder().data(agentEvent).build()
         return sink.asFlux()

@@ -25,16 +25,16 @@ public abstract class AgentBase implements IAgent {
     }
 
     @Override
-    public IAgentEvent invoke(IAgentEvent agentEvent) {
+    public IAgentEvent invoke(IAgentEvent agentEvent) throws Exception {
 
         IAgentRuntimeContext runtimeContext = null;
 
+        IAgentGraph agentGraph = getAgentGraph();
+
+        runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
+                getAgentGraph());
+
         try {
-
-            IAgentGraph agentGraph = getAgentGraph();
-
-            runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
-                    getAgentGraph());
 
             return agentGraph.invoke(runtimeContext);
 
@@ -47,28 +47,30 @@ public abstract class AgentBase implements IAgent {
     }
 
     // @Override
-    // public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent) {
-    //     return FunctionToolCallback.builder(
-    //             getName(), new Function<AsToolRequest, AsToolResponse>() {
-    //                 @Override
-    //                 public AsToolResponse apply(AsToolRequest request) {
-    //                     try {
-    //                         getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
-    //                                 agentEvent);
-    //                     } catch (Exception e) {
-    //                         e.printStackTrace();
-    //                         return AsToolResponse.builder().isSuccess(false).message("未处理成功: " + e.getMessage())
-    //                                 .build();
-    //                     }
+    // public FunctionToolCallback<AsToolRequest, AsToolResponse>
+    // asToolCallback(IAgentEvent agentEvent) {
+    // return FunctionToolCallback.builder(
+    // getName(), new Function<AsToolRequest, AsToolResponse>() {
+    // @Override
+    // public AsToolResponse apply(AsToolRequest request) {
+    // try {
+    // getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
+    // agentEvent);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // return AsToolResponse.builder().isSuccess(false).message("未处理成功: " +
+    // e.getMessage())
+    // .build();
+    // }
 
-    //                     return AsToolResponse.builder().isSuccess(true)
-    //                             .message("已交由" + getName() + "处理" + getDescription())
-    //                             .build();
-    //                 }
-    //             })
-    //             .description(getDescription())
-    //             .inputType(AsToolRequest.class)
-    //             .build();
+    // return AsToolResponse.builder().isSuccess(true)
+    // .message("已交由" + getName() + "处理" + getDescription())
+    // .build();
+    // }
+    // })
+    // .description(getDescription())
+    // .inputType(AsToolRequest.class)
+    // .build();
     // }
 
     public class AgentGraphListener implements IAgentGraphListener {
