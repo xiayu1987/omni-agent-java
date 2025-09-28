@@ -260,6 +260,12 @@ public class OmniAgentEngine implements IAgentEngine {
 
                 IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
 
+                ISseChanel sseChanel = agentEvent.getSseChanel();
+                if (sseChanel != null) {
+                    sseChanel
+                            .tryEmitNext(agentEvent);
+                }
+
                 endSession(agent, agentEvent, agentResponse, agentSession);
             }
 
@@ -317,8 +323,6 @@ public class OmniAgentEngine implements IAgentEngine {
         public void onInvokeStream(IAgent agent, IAgentEvent agentEvent,
                 IAgentRuntimeContext agentRuntimeContext, AgentGraphInvokeStreamContent content) {
 
-            ISseChanel sseChanel = agentEvent.getSseChanel();
-
             if (agentRuntimeContext.isEnd()) {
                 return;
             }
@@ -327,7 +331,7 @@ public class OmniAgentEngine implements IAgentEngine {
                 onError(agent, agentEvent, agentRuntimeContext, new Exception(content.getContent()));
                 return;
             } else if (!content.isComplete()) {
-
+                ISseChanel sseChanel = agentEvent.getSseChanel();
                 agentEvent.setAgentResponse(AgentResponse.builder().responseType(EAgentResponseType.TEXT)
                         .responseData(content.getContent()).build());
                 if (sseChanel != null) {

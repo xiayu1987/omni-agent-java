@@ -19,6 +19,7 @@ import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.event.IEventListener.AgentGraphInvokeStreamContent;
+import com.beraising.agent.omni.core.exception.BusinessException;
 import com.beraising.agent.omni.core.graph.edge.IGraphEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
@@ -181,7 +182,13 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
                                 .build());
 
             }).exceptionally(exception -> {
-                eventListener.onError(agent, agentEvent, agentRuntimeContext, exception);
+                BusinessException be = unwrap(exception, BusinessException.class);
+                if (be != null) {
+                    eventListener.onError(agent, agentEvent, agentRuntimeContext, be);
+                } else {
+                    eventListener.onError(agent, agentEvent, agentRuntimeContext, exception);
+                }
+
                 return null;
             });
         });
@@ -236,5 +243,15 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
 
     public abstract IAgentResponse createOutput(IAgentRuntimeContext agentRuntimeContext, IAgentEvent agentEvent,
             IGraphNode graphNode, T graphState);
+
+    public static <T extends Throwable> T unwrap(Throwable e, Class<T> type) {
+        while (e != null) {
+            if (type.isInstance(e)) {
+                return type.cast(e);
+            }
+            e = e.getCause();
+        }
+        return null;
+    }
 
 }

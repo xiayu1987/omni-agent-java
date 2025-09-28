@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import com.beraising.agent.omni.core.agents.intent.graph.state.IntentState;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
+import com.beraising.agent.omni.core.exception.BusinessException;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.graph.node.GraphNodeBase;
 import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
@@ -51,7 +52,7 @@ public class IntentNode extends GraphNodeBase<IntentState> {
         JsonObject jsonObject = new Gson().fromJson(jsonStr, JsonObject.class);
         boolean isSuccess = jsonObject.get("isSuccess").getAsBoolean();
         if (isSuccess == false) {
-            throw new Exception(jsonStr);
+            throw new BusinessException(jsonStr);
         }
 
         return graphState.getUpdatedIntentResult(content);
