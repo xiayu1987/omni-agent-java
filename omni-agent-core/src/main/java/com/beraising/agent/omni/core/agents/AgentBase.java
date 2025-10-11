@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.graph.GraphLifecycleListener;
 import com.alibaba.cloud.ai.graph.StateGraph;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
@@ -116,7 +115,7 @@ public abstract class AgentBase implements IAgent {
                             .getAgentRuntimeContextById(state.get(IGraphState.getAgentSessionIDKey()).toString(),
                                     state.get(IGraphState.getAgentRuntimeContextIDKey()).toString());
 
-                    agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+                    agentEvent = agentRuntimeContext.getCurrentEvent();
 
                     AgentBase.this.eventListener.onComplete(AgentBase.this, agentEvent, agentRuntimeContext,
                             AgentBase.this.getAgentGraph().createOutput(agentRuntimeContext,

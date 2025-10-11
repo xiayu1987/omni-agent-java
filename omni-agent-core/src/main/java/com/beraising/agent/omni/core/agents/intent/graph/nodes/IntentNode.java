@@ -9,6 +9,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.core.io.Resource;
 
 import com.beraising.agent.omni.core.agents.intent.graph.state.IntentState;
+import com.beraising.agent.omni.core.common.JsonUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.exception.BusinessException;
@@ -37,7 +38,8 @@ public class IntentNode extends GraphNodeBase<IntentState> {
 
         SystemMessage systemMessageAgents = new SystemMessage("\r\n当前任务可用agent" + agents);
         SystemMessage systemMessageRule = new SystemMessage(
-                "\r\n当前任务：" + agentRuntimeContext.getAgent().getDescription() + "\r\n根据对话识别改由什么agent开始或继续任务,并给出agent名称");
+                "\r\n当前任务：" + agentRuntimeContext.getAgent().getDescription()
+                        + "\r\n根据对话识别改由什么agent开始或继续任务,并给出agent名称");
         SystemMessage systemMessageFormat = new SystemMessage(this.intentFormat);
         UserMessage userMessage = new UserMessage("\r\n当前任务对话记录：" + graphState.getUserInput());
 
@@ -47,7 +49,7 @@ public class IntentNode extends GraphNodeBase<IntentState> {
         String content = getChatClient().prompt(prompt)
                 .call().content();
 
-        String jsonStr = content.replaceAll("(?s)```json\\s*(.*?)\\s*```", "$1");
+        String jsonStr = JsonUtils.extractFirstJson(content);
 
         JsonObject jsonObject = new Gson().fromJson(jsonStr, JsonObject.class);
         boolean isSuccess = jsonObject.get("isSuccess").getAsBoolean();

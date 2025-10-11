@@ -1,29 +1,35 @@
-输出格式json
-正确返回表单输出格式
+输出格式必须是一个 JSON 对象，且只能有以下两种情况之一：
+
+1. 正确返回表单：
 {
   "isSuccess": true,
-  "message": "",
+  "message": "成功信息，可以为空字符串",
   "formInfo": {
-    "formName": "",
-    "formType": "",
+    "formName": "表单名称（字符串）",
+    "formType": "表单类型（字符串）",
     "formFields": [
       {
-        "fieldName": "",
-        "fieldType": ""
+        "fieldName": "字段名称（字符串）",
+        "fieldType": "字段类型（字符串）"
       },
       {
-        "fieldName": "",
-        "fieldType": ""
-      },
-      {
-        "fieldName": "",
-        "fieldType": ""
+        "fieldName": "字段名称（字符串）",
+        "fieldType": "字段类型（字符串）"
       }
+      ...
     ]
   }
 }
-错误返回表单输出格式
+
+2. 错误返回表单：
 {
   "isSuccess": false,
-  "message": "" //错误信息
+  "message": "错误信息（字符串）"
 }
+
+约束要求：
+- isSuccess 必须是布尔值 (true 或 false)
+- message 必须是字符串
+- 正确返回时，formInfo 必须包含 formName、formType、formFields
+- formFields 必须是数组，每个元素必须包含 fieldName 和 fieldType
+- 输出中只允许出现一个 JSON 对象，不要包含解释、Markdown 或额外文本

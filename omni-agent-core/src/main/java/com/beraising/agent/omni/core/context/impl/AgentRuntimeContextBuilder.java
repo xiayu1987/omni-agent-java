@@ -25,6 +25,71 @@ public class AgentRuntimeContextBuilder implements IAgentRuntimeContextBuilder {
     }
 
     @Override
+    public IAgentRuntimeContext initialize(IAgentEvent agentEvent) throws Exception {
+        if (agentEvent == null) {
+            throw new IllegalArgumentException("Agent event cannot be null");
+        }
+
+        IAgentRuntimeContext agentRuntimeContext = new AgentRuntimeContext();
+        agentRuntimeContext.setAgentRuntimeContextId(UUID.randomUUID().toString());
+        agentRuntimeContext.setAgentSessionId(agentEvent.getAgentSessionId());
+        agentRuntimeContext.setAgent(null);
+        agentRuntimeContext.setAgentName("");
+        agentRuntimeContext.setIsEnd(false);
+        agentRuntimeContext.getAgentEvents().add(agentEvent);
+
+        return agentRuntimeContext;
+    }
+
+    @Override
+    public IAgentRuntimeContext enrich(IAgentRuntimeContext agentRuntimeContext, IAgentGraph graph) throws Exception {
+        if (agentRuntimeContext == null) {
+            throw new IllegalArgumentException("Agent runtime context cannot be null");
+        }
+
+        if (graph == null) {
+            throw new IllegalArgumentException("Agent graph cannot be null");
+        }
+
+        agentRuntimeContext.setAgent(graph.getAgent());
+        if (graph.getAgent() != null) {
+            agentRuntimeContext.setAgentName(graph.getAgent().getName());
+        }
+
+        IGraphState graphState = graph.newGraphState();
+        agentRuntimeContext.setGraphState(graphState);
+
+        HashMap<String, KeyStrategy> stateKeys = graphState.getStateKeys();
+
+        KeyStrategyFactory keyStrategyFactory = () -> {
+
+            HashMap<String, KeyStrategy> result = new HashMap<>();
+            result.putAll(IGraphState.getDefaultStateKeys());
+            result.putAll(stateKeys);
+            return result;
+        };
+
+        graph.setGraphNodes(new ArrayList<>());
+        graph.setGraphEdges(new ArrayList<>());
+        StateGraph stateGraph = graph.getStateGraph(keyStrategyFactory);
+
+        String[] interruptNodes = graph.getGraphNodes().stream()
+                .filter(node -> node instanceof IInterruptNode)
+                .map(node -> node.getName())
+                .toArray(String[]::new);
+
+        CompiledGraph compiledGraph = stateGraph
+                .compile(CompileConfig.builder()
+                        .saverConfig(graph.getAgent().getAgentStaticContext().getGraphSaverConfig())
+                        .withLifecycleListener(graph.getAgentGraphListener().getStateGraphLifecycleListener())
+                        .interruptAfter(interruptNodes)
+                        .build());
+        agentRuntimeContext.setCompiledGraph(compiledGraph);
+
+        return agentRuntimeContext;
+    }
+
+    @Override
     public IAgentRuntimeContext build(IAgentEvent agentEvent, IAgentGraph graph)
             throws Exception {
         if (agentEvent == null) {

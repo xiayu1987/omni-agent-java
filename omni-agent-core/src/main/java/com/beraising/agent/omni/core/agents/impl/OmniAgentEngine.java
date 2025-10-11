@@ -25,30 +25,25 @@ import com.beraising.agent.omni.core.agents.AgentRegistry;
 import com.beraising.agent.omni.core.agents.IAgent;
 import com.beraising.agent.omni.core.agents.IAgentEngine;
 import com.beraising.agent.omni.core.agents.intent.IIntentAgent;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContextBuilder;
 import com.beraising.agent.omni.core.event.EAgentRequestType;
 import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.event.IAgentRequest;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.event.ISseChanel;
+import com.beraising.agent.omni.core.event.IEventListener.StreamContent;
+import com.beraising.agent.omni.core.event.impl.AgentEvent;
 import com.beraising.agent.omni.core.event.impl.AgentRequest;
 import com.beraising.agent.omni.core.event.impl.AgentResponse;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.session.IAgentSession;
 import com.beraising.agent.omni.core.session.IAgentSessionManage;
 import com.beraising.agent.omni.core.session.impl.AgentSessionItem;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Component
 public class OmniAgentEngine implements IAgentEngine {
@@ -104,102 +99,195 @@ public class OmniAgentEngine implements IAgentEngine {
         return agentEvent;
     }
 
-    private void handleIntentError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+    private void handleIntentError(IAgent intentAgent, IAgentEvent intentEvent,
+            IAgentRuntimeContext intentAgentRuntimeContext,
             Throwable throwable) {
-        IntentAgentEvent intentAgentEvent = (IntentAgentEvent) agentEvent;
-        IAgentEvent userEvent = intentAgentEvent.getUserAgentEvent();
-        IAgentSession userAgentSession = agentSessionManage.getAgentSessionById(userEvent.getAgentSessionId());
-        IAgentRuntimeContext userLastContext = null;
-        if (userAgentSession != null) {
-            userLastContext = ListUtils.lastOf(userAgentSession.getAgentRuntimeContexts());
+        IAgentEvent userCurrentEvent = null;
+        IAgentSession userAgentSession = agentSessionManage.getAgentSessionById(intentEvent.getParentAgentSessionId());
+        IAgentRuntimeContext userCurrentRuntimeContext = null;
+
+        if (userAgentSession == null) {
+            return;
         }
 
-        eventListener.onError(null, userEvent, userLastContext, new Exception(throwable.getMessage()));
+        userCurrentRuntimeContext = userAgentSession.getCurrentRuntimeContext();
 
+        if (userCurrentRuntimeContext == null) {
+            return;
+        }
+
+        userCurrentEvent = userCurrentRuntimeContext.getCurrentEvent();
+
+        if (userCurrentEvent == null) {
+            return;
+        }
+
+        eventListener.onCollab(intentAgent, userCurrentEvent, intentEvent);
+
+        eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext, throwable);
     }
 
-    private void handleIntentComplete(IAgent intentAgent, IAgentEvent intentEvent,
-            IAgentRuntimeContext agentRuntimeContext,
-            IAgentResponse agentResponse) {
-        IntentAgentEvent intentAgentEvent = (IntentAgentEvent) intentEvent;
-        IAgentEvent userEvent = intentAgentEvent.getUserAgentEvent();
-        IAgentSession userAgentSession = agentSessionManage.getAgentSessionById(userEvent.getAgentSessionId());
-        IAgentRuntimeContext userLastContext = null;
+    private void handleIntentComplete(IAgent intentAgent,
+            IAgentEvent intentEvent,
+            IAgentRuntimeContext intentAgentRuntimeContext,
+            IAgentResponse intentAgentResponse) {
+        IAgentEvent userCurrentEvent = null;
+        IAgentSession userAgentSession = agentSessionManage.getAgentSessionById(intentEvent.getParentAgentSessionId());
+        IAgentRuntimeContext userCurrentRuntimeContext = null;
         String userNextAgentName = "";
-        if (userAgentSession != null) {
-            userLastContext = ListUtils.lastOf(userAgentSession.getAgentRuntimeContexts());
-            if (userLastContext != null) {
-                userNextAgentName = userLastContext.getAgentName();
-            }
+
+        if (userAgentSession == null) {
+            return;
         }
+
+        userCurrentRuntimeContext = userAgentSession.getCurrentRuntimeContext();
+
+        if (userCurrentRuntimeContext == null) {
+            return;
+        }
+
+        userCurrentEvent = userCurrentRuntimeContext.getCurrentEvent();
+
+        if (userCurrentEvent == null) {
+            return;
+        }
+
+        eventListener.onCollab(intentAgent, userCurrentEvent, intentEvent);
 
         try {
             JsonObject obj = JsonParser.parseString(intentEvent.getAgentResponse().getResponseData())
                     .getAsJsonObject();
-            String nextIntentAgentName = obj.get("nextAgentName").getAsString();
 
-            if (!Objects.equals(userNextAgentName, nextIntentAgentName) && userLastContext != null) {
-                userLastContext.setIsEnd(true);
+            boolean isSuccess = obj.has("isSuccess") && obj.get("isSuccess").getAsBoolean();
+            if (!isSuccess) {
+                // 错误情况
+                String errMsg = obj.has("message") ? obj.get("message").getAsString() : "意图识别失败";
+                eventListener.onError(intentAgent, userCurrentEvent, null, new Exception(errMsg));
+                return;
+            }
+
+            boolean isContinue = obj.has("isContinue") && obj.get("isContinue").getAsBoolean();
+            boolean isAmbiguous = obj.has("isAmbiguous") && obj.get("isAmbiguous").getAsBoolean();
+            String nextIntentAgentName = obj.has("nextAgentName") ? obj.get("nextAgentName").getAsString() : "";
+
+            // 情况 1: 模糊意图
+            if (isAmbiguous) {
+                // 这里不要直接切换或结束，而是提示用户确认
+                String msg = obj.has("message") ? obj.get("message").getAsString() : "意图不明确，请确认是否继续当前任务";
+
+                eventListener.onInvokeStream(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                        StreamContent.builder().isError(false).content(msg).isComplete(false).build());
+
+                eventListener.onInterrupt(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                        AgentResponse.builder().responseType(EAgentResponseType.TEXT).responseData(msg).build());
+                return;
+            }
+
+            // 情况 2: 意图没变，继续上一个任务
+            if (isContinue && Objects.equals(userNextAgentName, nextIntentAgentName)) {
+                if (userCurrentRuntimeContext != null) {
+                    // 复用上一个 agent
+                    IAgent nextAgent = agentRegistry.getAgentByName(userNextAgentName);
+                    if (nextAgent != null) {
+
+                        nextAgent.init(eventListener);
+                        nextAgent.invoke(userCurrentEvent);
+                    }
+                }
+                return;
+            }
+
+            // 情况 3: 意图改变 -> 结束上一个任务
+            if (!isContinue && userCurrentRuntimeContext != null
+                    && userCurrentRuntimeContext.getGraphRunStatus() >= 1) {
+                eventListener.onInvokeStream(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                        StreamContent.builder().isError(false).content("意图改变结束上一个任务").isComplete(false).build());
+
+                eventListener.onEndGraph(userCurrentRuntimeContext.getAgent(), userCurrentEvent,
+                        userCurrentRuntimeContext);
+                return;
             }
 
             IAgent nextAgent = agentRegistry.getAgentByName(nextIntentAgentName);
             if (nextAgent == null) {
-                intentEventListener.onError(nextAgent, userEvent, userLastContext, new Exception("无法识别意图"));
+                eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                        new Exception("无法识别意图"));
             } else {
-                nextAgent.init(eventListener);
-                nextAgent.invoke(userEvent);
 
+                nextAgent.init(eventListener);
+                nextAgent.invoke(userCurrentEvent);
             }
 
         } catch (Exception e) {
-            intentEventListener.onError(null, userEvent, userLastContext, new Exception("意图识别错误"));
+            eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                    new Exception(e.getMessage()));
         }
     }
 
-    private IntentAgentEvent createIntentEvent(IAgentEvent userEvent) {
+    private IAgentEvent createIntentEvent(IAgentEvent userEvent) {
 
-        IAgentSession userSession = agentSessionManage
-                .getAgentSessionById(userEvent.getAgentSessionId());
+        // 获取用户会话和当前运行上下文
+        IAgentSession userSession = agentSessionManage.getAgentSessionById(userEvent.getAgentSessionId());
+        IAgentRuntimeContext userCurrentRuntimeContext = (userSession != null)
+                ? userSession.getCurrentRuntimeContext()
+                : null;
 
-        IAgentRuntimeContext latestAgentRuntimeContext = null;
-
-        if (userSession == null) {
-
-        } else {
-            latestAgentRuntimeContext = ListUtils.lastOf(userSession.getAgentRuntimeContexts());
-        }
-
+        // 构建历史上下文
         String chatContext = "";
-        if (latestAgentRuntimeContext != null && latestAgentRuntimeContext.isEnd() == false) {
-
-            chatContext = latestAgentRuntimeContext.getAgentEvents().stream()
-                    .map((item) -> {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("\r\n请求 request:\r\n");
-                        sb.append(item.getAgentRequest().getRequestData());
-                        sb.append("\r\n响应 response:\r\n");
-                        sb.append(item.getAgentResponse().getResponseData());
-
-                        return sb.toString();
-                    })
-                    .collect(Collectors.joining(", "));
+        if (userCurrentRuntimeContext != null && !userCurrentRuntimeContext.isEnd()) {
+            chatContext = userCurrentRuntimeContext.getAgentEvents().stream()
+                    .map(this::formatEventLog)
+                    .collect(Collectors.joining("\n\n"));
         }
 
+        // 构建 prompt
+        StringBuilder promptBuilder = new StringBuilder();
+
+        // 系统说明
+        promptBuilder.append("【系统说明】：\n")
+                .append("你是意图识别助理，需要根据用户输入和历史对话生成下一步意图事件。\n")
+                .append("请严格按照上下文处理，不要输出多余文本或解释。\n\n");
+
+        // 历史上下文
+        if (!chatContext.isEmpty()) {
+            promptBuilder.append("【之前聊天记录 chatContext】：\n")
+                    .append(chatContext)
+                    .append("\n\n");
+        }
+
+        // 当前请求
+        promptBuilder.append("【当前最新请求 request】：\n")
+                .append(userEvent.getAgentRequest().getRequestData());
+
+        String promptContent = promptBuilder.toString();
+
+        // 构建结果事件
+        return AgentEvent.builder()
+                .userType(EUserType.SYSTEM)
+                .isStream(userEvent.isStream())
+                .agentSessionId("") // 新的 session，置空
+                .parentAgentSessionId(userEvent.getAgentSessionId())
+                .agentRequest(AgentRequest.builder()
+                        .requestType(EAgentRequestType.TEXT)
+                        .requestData(promptContent)
+                        .build())
+                .build();
+    }
+
+    /**
+     * 格式化单个事件日志
+     */
+    private String formatEventLog(IAgentEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\r\n之前聊天记录 chatContext:\r\n");
-        sb.append(chatContext);
-        sb.append("\r\n当前最新请求 request:\r\n");
-        sb.append(userEvent.getAgentRequest().getRequestData());
-
-        IntentAgentEvent result = new IntentAgentEvent();
-        result.setUserAgentEvent(userEvent);
-        result.setUserType(EUserType.SYSTEM);
-        result.setStream(userEvent.isStream());
-        result.setAgentSessionId("");
-        result.setAgentRequest(AgentRequest.builder().requestType(EAgentRequestType.TEXT)
-                .requestData(sb.toString()).build());
-
-        return result;
+        if (event.getAgentRequest() != null) {
+            sb.append("请求:\n")
+                    .append(event.getAgentRequest().getRequestData());
+        }
+        if (event.getAgentResponse() != null) {
+            sb.append("\n响应:\n")
+                    .append(event.getAgentResponse().getResponseData());
+        }
+        return sb.toString();
     }
 
     public class IntentEventListener extends EventListener {
@@ -216,18 +304,20 @@ public class OmniAgentEngine implements IAgentEngine {
         }
 
         @Override
-        public void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                Throwable throwable) {
-
-            intentError.exec(agent, agentEvent, agentRuntimeContext, throwable);
-        }
-
-        @Override
         public void onComplete(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                 IAgentResponse agentResponse) {
             super.onComplete(agent, agentEvent, agentRuntimeContext, agentResponse);
 
             intentComplete.exec(agent, agentEvent, agentRuntimeContext, agentResponse);
+        }
+
+        @Override
+        public void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                Throwable throwable) {
+
+            super.onError(agent, agentEvent, agentRuntimeContext, throwable);
+
+            intentError.exec(agent, agentEvent, agentRuntimeContext, throwable);
         }
 
     }
@@ -261,9 +351,9 @@ public class OmniAgentEngine implements IAgentEngine {
                 IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
 
                 ISseChanel sseChanel = agentEvent.getSseChanel();
+
                 if (sseChanel != null) {
-                    sseChanel
-                            .tryEmitNext(agentEvent);
+                    sseChanel.tryEmitNext(agentEvent);
                 }
 
                 endSession(agent, agentEvent, agentResponse, agentSession);
@@ -283,12 +373,53 @@ public class OmniAgentEngine implements IAgentEngine {
                 }
                 agentSession = agentSessionManage.createAgentSession(parentSessionId,
                         agentEvent.getUserType(), agentEvent.getUserId());
-            }
 
-            agentEvent.setAgentSessionId(agentSession.getAgentSessionId());
+                agentEvent.setAgentSessionId(agentSession.getAgentSessionId());
+
+                IAgentRuntimeContext runtimeContext = agentRuntimeContextBuilder.initialize(agentEvent);
+
+                agentSessionManage.addAgentRuntimeContext(agentSession, runtimeContext);
+            } else {
+
+                IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
+
+                if (currentRuntimeContext != null) {
+                    if (currentRuntimeContext.isEnd()) {
+                        IAgentRuntimeContext runtimeContext = agentRuntimeContextBuilder.initialize(agentEvent);
+                        agentSessionManage.addAgentRuntimeContext(agentSession, runtimeContext);
+                    } else {
+                        currentRuntimeContext.getAgentEvents().add(agentEvent);
+                        agentSessionManage.updateAgentRuntimeContext(agentSession, currentRuntimeContext);
+                    }
+
+                }
+
+            }
 
             return agentSession;
 
+        }
+
+        @Override
+        public void onCollab(IAgent agent, IAgentEvent userEvent, IAgentEvent collabEvent) {
+
+            IAgentSession userSession = agentSessionManage.getAgentSessionById(userEvent.getAgentSessionId());
+            IAgentRuntimeContext userCurrentRuntimeContext = userSession.getCurrentRuntimeContext();
+
+            if (userCurrentRuntimeContext != null) {
+
+                IAgentEvent copyEvent = collabEvent.copy();
+                copyEvent.setAgentRequest(userEvent.getAgentRequest());
+                copyEvent.setAgentSessionId(userEvent.getAgentSessionId());
+                copyEvent.setParentAgentSessionId(userEvent.getParentAgentSessionId());
+                copyEvent.setUserId(userEvent.getUserId());
+                copyEvent.setUserType(userEvent.getUserType());
+                copyEvent.setSseChanel(userEvent.getSseChanel());
+
+                userCurrentRuntimeContext.getAgentEvents().add(copyEvent);
+            }
+
+            agentSessionManage.updateAgentRuntimeContext(userSession, userCurrentRuntimeContext);
         }
 
         @Override
@@ -298,30 +429,62 @@ public class OmniAgentEngine implements IAgentEngine {
             IAgentSession agentSession = null;
 
             agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
-            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+            IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
 
-            if (lastAgentRuntimeContext == null || lastAgentRuntimeContext.isEnd()
-                    || !agent.getName().equals(lastAgentRuntimeContext.getAgent().getName())
-                    || lastAgentRuntimeContext.getCompiledGraph() == null) {
-
+            if (currentRuntimeContext == null) {
                 result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
 
                 agentSessionManage.addAgentRuntimeContext(agentSession, result);
 
-                if (lastAgentRuntimeContext != null) {
-                    lastAgentRuntimeContext.setIsEnd(true);
-                }
-            } else {
-                result = lastAgentRuntimeContext;
-                result.getAgentEvents().add(agentEvent);
+                return result;
+            }
+
+            if (currentRuntimeContext.isEnd()) {
+                result = agentRuntimeContextBuilder.build(agentEvent, agentGraph);
+
+                agentSessionManage.addAgentRuntimeContext(agentSession, result);
+
+                return result;
+            }
+
+            if (currentRuntimeContext.getCompiledGraph() == null) {
+                result = agentRuntimeContextBuilder.enrich(currentRuntimeContext, agentGraph);
+
+                agentSessionManage.updateAgentRuntimeContext(agentSession, currentRuntimeContext);
+
+                return result;
+            }
+
+            if (currentRuntimeContext.getGraphRunStatus() >= 1) {
+                result = currentRuntimeContext;
+                return result;
             }
 
             return result;
         }
 
         @Override
+        public void onStartGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext) {
+            agentRuntimeContext.setGraphRunStatus(1);
+            IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
+            if (agentRuntimeContext != null) {
+                this.agentSessionManage.updateAgentRuntimeContext(agentSession, agentRuntimeContext);
+            }
+        }
+
+        @Override
+        public void onEndGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext) {
+            agentRuntimeContext.setGraphRunStatus(2);
+            agentRuntimeContext.setIsEnd(true);
+            IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
+            if (agentRuntimeContext != null) {
+                this.agentSessionManage.updateAgentRuntimeContext(agentSession, agentRuntimeContext);
+            }
+        }
+
+        @Override
         public void onInvokeStream(IAgent agent, IAgentEvent agentEvent,
-                IAgentRuntimeContext agentRuntimeContext, AgentGraphInvokeStreamContent content) {
+                IAgentRuntimeContext agentRuntimeContext, StreamContent content) {
 
             if (agentRuntimeContext.isEnd()) {
                 return;
@@ -352,12 +515,12 @@ public class OmniAgentEngine implements IAgentEngine {
             }
 
             IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
-            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-            if (lastAgentRuntimeContext.getAgentRuntimeContextId()
-                    .equals(agentRuntimeContext.getAgentRuntimeContextId()) && !lastAgentRuntimeContext.isEnd()) {
-                lastAgentRuntimeContext.setIsEnd(true);
-                IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
-                lastAgentEvent.setAgentResponse(agentResponse);
+            IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
+            if (currentRuntimeContext.getAgentRuntimeContextId()
+                    .equals(agentRuntimeContext.getAgentRuntimeContextId()) && !currentRuntimeContext.isEnd()) {
+                currentRuntimeContext.setIsEnd(true);
+                IAgentEvent currentEvent = currentRuntimeContext.getCurrentEvent();
+                currentEvent.setAgentResponse(agentResponse);
 
                 endSession(agent, agentEvent, agentResponse, agentSession);
             }
@@ -371,11 +534,11 @@ public class OmniAgentEngine implements IAgentEngine {
             }
 
             IAgentSession agentSession = agentSessionManage.getAgentSessionById(agentEvent.getAgentSessionId());
-            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-            if (lastAgentRuntimeContext.getAgentRuntimeContextId()
-                    .equals(agentRuntimeContext.getAgentRuntimeContextId()) && !lastAgentRuntimeContext.isEnd()) {
-                IAgentEvent lastAgentEvent = ListUtils.lastOf(lastAgentRuntimeContext.getAgentEvents());
-                lastAgentEvent.setAgentResponse(agentResponse);
+            IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
+            if (currentRuntimeContext.getAgentRuntimeContextId()
+                    .equals(agentRuntimeContext.getAgentRuntimeContextId()) && !currentRuntimeContext.isEnd()) {
+                IAgentEvent currentEvent = currentRuntimeContext.getCurrentEvent();
+                currentEvent.setAgentResponse(agentResponse);
 
                 endSession(agent, agentEvent, agentResponse, agentSession);
             }
@@ -399,10 +562,10 @@ public class OmniAgentEngine implements IAgentEngine {
                     .agentResponse(agentEvent.getAgentResponse())
                     .build());
 
-            IAgentRuntimeContext lastAgentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
-            if (lastAgentRuntimeContext != null) {
+            IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
+            if (currentRuntimeContext != null) {
 
-                this.agentSessionManage.updateAgentRuntimeContext(agentSession, lastAgentRuntimeContext);
+                this.agentSessionManage.updateAgentRuntimeContext(agentSession, currentRuntimeContext);
             }
 
             ISseChanel sseChanel = agentEvent.getSseChanel();
@@ -422,39 +585,6 @@ public class OmniAgentEngine implements IAgentEngine {
     public interface IIntentError {
         void exec(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                 Throwable throwable);
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class IntentAgentEvent implements IAgentEvent {
-
-        private IAgentRequest agentRequest;
-        private IAgentResponse agentResponse;
-        private String agentSessionId;
-        private EUserType userType;
-        private String userId;
-        private boolean isStream;
-        private String responseFormat;
-        @JsonIgnore
-        private transient ISseChanel sseChanel;
-        @JsonIgnore
-        private transient IAgentEvent userAgentEvent;
-
-        @Override
-        public IAgentEvent copy() {
-            IntentAgentEvent copy = new IntentAgentEvent();
-            copy.setAgentRequest(agentRequest != null ? agentRequest.copy() : null);
-            copy.setAgentResponse(agentResponse != null ? agentResponse.copy() : null);
-            copy.setAgentSessionId(agentSessionId);
-            copy.setUserId(userId);
-            copy.setStream(isStream);
-            copy.setSseChanel(sseChanel);
-            copy.setUserType(userType);
-            copy.setUserAgentEvent(userAgentEvent);
-            return copy;
-        }
-
     }
 
 }

@@ -14,11 +14,17 @@ public interface IEventListener {
 
         IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent) throws Exception;
 
+        void onCollab(IAgent agent, IAgentEvent userEvent, IAgentEvent collabEvent);
+
         IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph)
                         throws Exception;
 
         void onInvokeStream(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                        AgentGraphInvokeStreamContent content);
+                        StreamContent content);
+
+        void onStartGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext);
+
+        void onEndGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext);
 
         void onComplete(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                         IAgentResponse agentResponse);
@@ -33,7 +39,7 @@ public interface IEventListener {
         @Builder
         @NoArgsConstructor
         @AllArgsConstructor
-        public class AgentGraphInvokeStreamContent {
+        public class StreamContent {
 
                 private boolean isError;
                 private boolean isComplete;

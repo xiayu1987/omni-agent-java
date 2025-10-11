@@ -24,10 +24,11 @@ public class AgentEvent implements IAgentEvent {
     @JsonDeserialize(as = AgentResponse.class)
     private IAgentResponse agentResponse;
     private String agentSessionId;
-    private EUserType userType;
+    private String parentAgentSessionId;
+    @Builder.Default
+    private EUserType userType = EUserType.USER;
     private String userId;
     private boolean isStream;
-    private String responseFormat;
     @JsonIgnore
     private transient ISseChanel sseChanel;
 
@@ -37,6 +38,7 @@ public class AgentEvent implements IAgentEvent {
         copy.setAgentRequest(agentRequest != null ? agentRequest.copy() : null);
         copy.setAgentResponse(agentResponse != null ? agentResponse.copy() : null);
         copy.setAgentSessionId(agentSessionId);
+        copy.setParentAgentSessionId(parentAgentSessionId);
         copy.setUserId(userId);
         copy.setStream(isStream);
         copy.setSseChanel(sseChanel);

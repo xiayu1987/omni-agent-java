@@ -14,6 +14,10 @@ public interface IAgentEvent {
 
     void setAgentSessionId(String agentSessionId);
 
+    String getParentAgentSessionId();
+
+    void setParentAgentSessionId(String parentAgentSessionId);
+
     EUserType getUserType();
 
     void setUserType(EUserType userType);

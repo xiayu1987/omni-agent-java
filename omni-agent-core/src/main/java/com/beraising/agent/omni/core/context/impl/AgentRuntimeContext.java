@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.cloud.ai.graph.CompiledGraph;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.beraising.agent.omni.core.agents.IAgent;
+import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.impl.AgentEvent;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
@@ -29,6 +32,8 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
 
     @JsonProperty("end")
     private boolean isEnd;
+
+    private int graphRunStatus;
 
     public AgentRuntimeContext() {
         super();
@@ -112,6 +117,28 @@ public class AgentRuntimeContext implements IAgentRuntimeContext {
     @Override
     public void setAgentRuntimeContextId(String agentRuntimeContextId) {
         this.agentRuntimeContextId = agentRuntimeContextId;
+    }
+
+    @Override
+    public int getGraphRunStatus() {
+        return graphRunStatus;
+    }
+
+    @Override
+    public void setGraphRunStatus(int graphRunStatus) {
+        this.graphRunStatus = graphRunStatus;
+    }
+
+    @Override
+    public List<IAgentEvent> getAgentEventsByUserType(EUserType userType) {
+        return agentEvents.stream().filter(agentEvent -> agentEvent.getUserType().equals(userType)).toList();
+    }
+
+    @JSONField(serialize = false, deserialize = false)
+    @JsonIgnore
+    @Override
+    public IAgentEvent getCurrentEvent() {
+        return ListUtils.lastOf(agentEvents);
     }
 
 }

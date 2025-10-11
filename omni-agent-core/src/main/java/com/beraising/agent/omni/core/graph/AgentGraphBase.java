@@ -13,12 +13,11 @@ import com.alibaba.cloud.ai.graph.async.AsyncGenerator;
 import com.alibaba.cloud.ai.graph.state.StateSnapshot;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import com.beraising.agent.omni.core.agents.IAgent;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
-import com.beraising.agent.omni.core.event.IEventListener.AgentGraphInvokeStreamContent;
+import com.beraising.agent.omni.core.event.IEventListener.StreamContent;
 import com.beraising.agent.omni.core.exception.BusinessException;
 import com.beraising.agent.omni.core.graph.edge.IGraphEdge;
 import com.beraising.agent.omni.core.graph.node.IGraphNode;
@@ -108,23 +107,23 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
                 .threadId(agentRuntimeContext.getAgentRuntimeContextId())
                 .build();
 
-        IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+        IAgentEvent currentEvent = agentRuntimeContext.getCurrentEvent();
 
-        if (agentRuntimeContext.getAgentEvents().size() == 1) {
+        if (agentRuntimeContext.getGraphRunStatus() == 0) {
 
-            if (agentEvent != null && agentEvent.isStream()) {
+            eventListener.onStartGraph(agent, currentEvent, agentRuntimeContext);
+
+            if (currentEvent != null && currentEvent.isStream()) {
                 AsyncGenerator<NodeOutput> asyncGenerator = agentRuntimeContext.getCompiledGraph()
-                        .stream(createInput(agentEvent, agentRuntimeContext), runnableConfig);
+                        .stream(createInput(currentEvent, agentRuntimeContext), runnableConfig);
 
-                invokeGraphStream(agentRuntimeContext, agentEvent, asyncGenerator);
+                invokeGraphStream(agentRuntimeContext, currentEvent, asyncGenerator);
             } else {
                 agentRuntimeContext.getCompiledGraph()
-                        .invoke(createInput(agentEvent, agentRuntimeContext), runnableConfig);
+                        .invoke(createInput(currentEvent, agentRuntimeContext), runnableConfig);
             }
 
-        }
-
-        if (agentRuntimeContext.getAgentEvents().size() > 1) {
+        } else if (agentRuntimeContext.getGraphRunStatus() >= 1) {
 
             StateSnapshot stateSnapshot = agentRuntimeContext.getCompiledGraph().getState(runnableConfig);
             OverAllState state = stateSnapshot.state();
@@ -140,13 +139,13 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             }
 
             state.withHumanFeedback(
-                    new OverAllState.HumanFeedback(createFeedBack(agentEvent, agentRuntimeContext, nextNode), ""));
+                    new OverAllState.HumanFeedback(createFeedBack(currentEvent, agentRuntimeContext, nextNode), ""));
 
-            if (agentEvent != null && agentEvent.isStream()) {
+            if (currentEvent != null && currentEvent.isStream()) {
                 AsyncGenerator<NodeOutput> asyncGenerator = agentRuntimeContext.getCompiledGraph()
                         .streamFromInitialNode(state, runnableConfig);
 
-                invokeGraphStream(agentRuntimeContext, agentEvent, asyncGenerator);
+                invokeGraphStream(agentRuntimeContext, currentEvent, asyncGenerator);
             } else {
                 agentRuntimeContext.getCompiledGraph()
                         .invoke(state, runnableConfig);
@@ -154,7 +153,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
 
         }
 
-        return agentEvent;
+        return currentEvent;
 
     }
 
@@ -166,7 +165,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
                     if (output instanceof StreamingOutput streamingOutput) {
 
                         eventListener.onInvokeStream(agent, agentEvent, agentRuntimeContext,
-                                AgentGraphInvokeStreamContent.builder().isComplete(false).isError(false)
+                                StreamContent.builder().isComplete(false).isError(false)
                                         .content(streamingOutput.chunk()).build());
 
                     }
@@ -178,7 +177,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
             }).thenAccept(args -> {
 
                 eventListener.onInvokeStream(agent, agentEvent, agentRuntimeContext,
-                        AgentGraphInvokeStreamContent.builder().isComplete(true).isError(false)
+                        StreamContent.builder().isComplete(true).isError(false)
                                 .build());
 
             }).exceptionally(exception -> {
@@ -203,7 +202,7 @@ public abstract class AgentGraphBase<T extends IGraphState> implements IAgentGra
 
             Map<String, Object> stateMap = updatedGraphStateValue.exec();
             eventListener.onInvokeStream(agent, agentEvent, agentRuntimeContext,
-                    AgentGraphInvokeStreamContent.builder().isComplete(false).isError(false)
+                    StreamContent.builder().isComplete(false).isError(false)
                             .content(stateMap.values().stream().map(Object::toString).collect(Collectors.joining("\n")))
                             .build());
 

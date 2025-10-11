@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 
 import com.beraising.agent.omni.agents.form.graph.state.FormState;
 import com.beraising.agent.omni.agents.form.graph.state.FormSubmitData;
+import com.beraising.agent.omni.core.common.JsonUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
@@ -49,7 +50,7 @@ public class FormSubmitNode extends GraphNodeBase<FormState> {
         String content = getChatClient().prompt(prompt)
                 .toolCallbacks(this.formTools).call().content();
 
-        String jsonStr = content.replaceAll("(?s)```json\\s*(.*?)\\s*```", "$1");
+        String jsonStr = JsonUtils.extractFirstJson(content);
 
         return graphState.getUpdatedFormSubmitResult(new Gson().fromJson(jsonStr, FormSubmitData.class));
     }

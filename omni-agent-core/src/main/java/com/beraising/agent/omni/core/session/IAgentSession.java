@@ -29,5 +29,7 @@ public interface IAgentSession {
 
     List<IAgentRuntimeContext> getAgentRuntimeContexts();
 
+    IAgentRuntimeContext getCurrentRuntimeContext();
+
     void setAgentRuntimeContexts(List<IAgentRuntimeContext> agentRuntimeContexts);
 }
