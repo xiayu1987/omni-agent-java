@@ -1,10 +1,8 @@
 package com.beraising.agent.omni.core.context.impl;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
@@ -23,8 +21,7 @@ public class AgentStaticContext implements IAgentStaticContext {
     private final IAgentEngine agentEngine;
     private SaverConfig graphSaverConfig;
     private final IAgentSessionManage agentSessionManage;
-
-    private final int MAX_MESSAGES = 100;
+    
 
     public AgentStaticContext(IAgentEngine agentEngine, AgentRegistry agentRegistry,
             ChatClient.Builder chatClientBuilder,
@@ -37,16 +34,7 @@ public class AgentStaticContext implements IAgentStaticContext {
         this.agentSessionManage = agentSessionManage;
 
         this.chatClientBuilder
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(
-
-                        MessageWindowChatMemory.builder()
-                                .chatMemoryRepository(this.memoryRepository)
-                                .maxMessages(MAX_MESSAGES)
-                                .build()
-
-                )
-                        .build(),
-                        new SimpleLoggerAdvisor());
+                .defaultAdvisors(new SimpleLoggerAdvisor());
     }
 
     @Override

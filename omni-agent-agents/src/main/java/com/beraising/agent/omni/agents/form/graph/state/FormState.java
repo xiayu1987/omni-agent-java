@@ -8,7 +8,7 @@ import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.state.GraphStateBase;
-import com.beraising.agent.omni.core.graph.state.IUpdatedGraphState;
+import com.beraising.agent.omni.core.graph.state.IUpdatedGraphStateValue;
 import com.google.gson.Gson;
 
 public class FormState extends GraphStateBase {
@@ -45,7 +45,7 @@ public class FormState extends GraphStateBase {
                 FormSubmitData.class);
     }
 
-    public IUpdatedGraphState<FormState> getUpdatedUserInput(String value) {
+    public IUpdatedGraphStateValue<FormState> getUpdatedUserInput(String value) {
         return () -> {
             Map<String, Object> result = new HashMap<>();
             result.put("user_input", value);
@@ -53,7 +53,7 @@ public class FormState extends GraphStateBase {
         };
     }
 
-    public IUpdatedGraphState<FormState> getUpdatedFormGetResult(String value) {
+    public IUpdatedGraphStateValue<FormState> getUpdatedFormGetResult(String value) {
         return () -> {
             Map<String, Object> result = new HashMap<>();
             result.put("form_get_result", value);
@@ -61,7 +61,7 @@ public class FormState extends GraphStateBase {
         };
     }
 
-    public IUpdatedGraphState<FormState> getUpdatedFormSubmitResult(FormSubmitData value) {
+    public IUpdatedGraphStateValue<FormState> getUpdatedFormSubmitResult(FormSubmitData value) {
         return () -> {
             Map<String, Object> result = new HashMap<>();
 

@@ -37,9 +37,9 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
     private static final String FORM_GET_INTERRUPT_NODE_NAME = "form_get_interrupt_node";
     private static final String FORM_SUBMIT_CONDITIONAL_EDGE_NAME = "form_submit_conditional_edge";
 
-    private ToolCallbackProvider formTools;
-    private Resource formGetFormat;
-    private Resource formSubmitFormat;
+    private final ToolCallbackProvider formTools;
+    private final Resource formGetFormat;
+    private final Resource formSubmitFormat;
 
     public FormGraph(ToolCallbackProvider formTools,
             @Value("classpath:agents-prompts/form/form-get-format.txt") Resource formGetFormat,
@@ -135,7 +135,7 @@ public class FormGraph extends AgentGraphBase<FormState> implements IFormGraph {
         }
 
         if (graphNode.getName().equals(FORM_SUBMIT_INTERRUPT_NODE_NAME)) {
-            return AgentResponse.builder().responseType(EAgentResponseType.FORM)
+            return AgentResponse.builder().responseType(EAgentResponseType.TEXT)
                     .responseData(new Gson().toJson(graphState.getFormSubmitResult())).build();
         }
 

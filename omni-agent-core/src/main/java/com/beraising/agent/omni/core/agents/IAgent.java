@@ -1,10 +1,7 @@
 package com.beraising.agent.omni.core.agents;
 
-import org.springframework.ai.tool.function.FunctionToolCallback;
-
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
-import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 
@@ -27,7 +24,8 @@ public interface IAgent {
 
     IAgentEvent invoke(IAgentEvent agentEvent) throws Exception;
 
-    FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent);
+    // FunctionToolCallback<AsToolRequest, AsToolResponse>
+    // asToolCallback(IAgentEvent agentEvent);
 
     @Builder
     @Data
@@ -43,8 +41,6 @@ public interface IAgent {
     @NoArgsConstructor
     public class AsToolResponse {
         private boolean isSuccess;
-        private String errorMessage;
-        private IAgentResponse agentResponse;
-        private String resultFormat;
+        private String message;
     }
 }

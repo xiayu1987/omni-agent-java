@@ -5,15 +5,25 @@ import { useResponsive } from './composables/useResponsive'
 import SessionSidebar from './components/SessionSidebar.vue'
 import ChatLayout from './components/ChatLayout.vue'
 
+const sessionSidebar = ref<InstanceType<typeof SessionSidebar> | null>(null)
 const drawer = ref(false)
 const { isMobile } = useResponsive()
-</script>
 
-<style lang="css" scoped>
-.sidebar {
-  width: 260px;
+// 选中的会话 ID
+const selectedSessionId = ref<string | null>(null)
+
+// 处理会话选择
+function handleSessionSelect(id?: string) {
+  if (id) {
+    selectedSessionId.value = id
+  }
+  drawer.value = false
 }
-</style>
+
+function handleAddNewSession(id?: string) {
+  sessionSidebar.value?.updateSession(id ?? "")
+}
+</script>
 
 <template>
   <el-container class="full">
@@ -29,17 +39,17 @@ const { isMobile } = useResponsive()
     <el-container>
       <!-- 左侧会话（PC 显示） -->
       <el-aside v-if="!isMobile" class="sidebar">
-        <SessionSidebar />
+        <SessionSidebar ref="sessionSidebar" @select="handleSessionSelect" />
       </el-aside>
 
       <!-- 移动端抽屉 -->
-      <el-drawer v-model="drawer" title="会话" direction="ltr" size="80%">
-        <SessionSidebar @select="drawer = false" />
+      <el-drawer class="sidebar" v-model="drawer" title="会话" direction="ltr" size="80%">
+        <SessionSidebar ref="sessionSidebar" @select="handleSessionSelect" />
       </el-drawer>
 
       <!-- 主区域 -->
       <el-main class="main-panel">
-        <ChatLayout />
+        <ChatLayout @addNewSession="handleAddNewSession" :sessionId="selectedSessionId ?? ''" />
       </el-main>
     </el-container>
   </el-container>

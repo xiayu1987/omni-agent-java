@@ -6,7 +6,12 @@ const props = defineProps<{ loading: boolean }>()
 const emit = defineEmits<{ (e: 'send', text: string): void }>()
 
 const text = ref('')
-function onSend() { const t = text.value.trim(); if (!t) return; emit('send', t); text.value = '' }
+function onSend() {
+    const t = text.value.trim();
+    if (!t) return;
+    emit('send', t);
+    text.value = ''
+}
 </script>
 
 <template>

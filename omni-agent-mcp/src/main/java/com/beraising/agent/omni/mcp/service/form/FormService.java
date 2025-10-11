@@ -10,7 +10,7 @@ public class FormService {
     private static int GETCOUNT = 0;
     private static int SUBMITCOUNT = 1;
 
-    @Tool(description = "获取需填写的表单及字段信息")
+    @Tool(description = "获取需填写的表单结构字段信息")
     public String getFormInfo(@ToolParam(description = "表单名称") EFormType formType) {
 
         GETCOUNT++;
@@ -51,6 +51,7 @@ public class FormService {
             SUBMITCOUNT = 0;
             return "{\r\n" + //
                     "  \"isSuccess\": true,\r\n" + //
+                    "  \"message\": \"提交成功\"\r\n" + //
                     "}";
         }
 

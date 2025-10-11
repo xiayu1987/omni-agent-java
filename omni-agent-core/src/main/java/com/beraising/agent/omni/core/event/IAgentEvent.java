@@ -10,9 +10,29 @@ public interface IAgentEvent {
 
     void setAgentResponse(IAgentResponse agentResponse);
 
-    String getAgentSessionID();
+    String getAgentSessionId();
 
-    void setAgentSessionID(String agentSessionID);
+    void setAgentSessionId(String agentSessionId);
+
+    String getParentAgentSessionId();
+
+    void setParentAgentSessionId(String parentAgentSessionId);
+
+    EUserType getUserType();
+
+    void setUserType(EUserType userType);
+
+    String getUserId();
+
+    void setUserId(String userId);
+
+    boolean isStream();
+
+    void setStream(boolean stream);
+
+    void setSseChanel(ISseChanel sseChanel);
+
+    ISseChanel getSseChanel();
 
     IAgentEvent copy();
 

@@ -5,23 +5,46 @@ import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.graph.IAgentGraph;
 import com.beraising.agent.omni.core.session.IAgentSession;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 public interface IEventListener {
 
-        IAgentSession onStart(IAgent agent, IAgentEvent agentEvent)
-                        throws Exception;
+        IAgentSession onStart(IAgentSession parentSession, IAgentEvent agentEvent) throws Exception;
+
+        void onCollab(IAgent agent, IAgentEvent userEvent, IAgentEvent collabEvent);
 
         IAgentRuntimeContext beforeAgentInvoke(IAgent agent, IAgentEvent agentEvent, IAgentGraph agentGraph)
                         throws Exception;
 
+        void onInvokeStream(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
+                        StreamContent content);
+
+        void onStartGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext);
+
+        void onEndGraph(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext);
+
         void onComplete(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                        IAgentResponse agentResponse)
-                        throws Exception;
+                        IAgentResponse agentResponse);
 
         void onError(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
                         Throwable throwable);
 
         void onInterrupt(IAgent agent, IAgentEvent agentEvent, IAgentRuntimeContext agentRuntimeContext,
-                        IAgentResponse agentResponse)
-                        throws Exception;
+                        IAgentResponse agentResponse);
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public class StreamContent {
+
+                private boolean isError;
+                private boolean isComplete;
+                private String content;
+
+        }
 
 }

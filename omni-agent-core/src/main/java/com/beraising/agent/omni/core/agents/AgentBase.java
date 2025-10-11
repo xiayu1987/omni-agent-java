@@ -1,14 +1,10 @@
 package com.beraising.agent.omni.core.agents;
 
 import java.util.Map;
-import java.util.function.Function;
-import org.springframework.ai.tool.function.FunctionToolCallback;
 
 import com.alibaba.cloud.ai.graph.GraphLifecycleListener;
 import com.alibaba.cloud.ai.graph.StateGraph;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
-import com.beraising.agent.omni.core.event.EAgentResponseType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.event.IAgentResponse;
 import com.beraising.agent.omni.core.event.IEventListener;
@@ -28,16 +24,16 @@ public abstract class AgentBase implements IAgent {
     }
 
     @Override
-    public IAgentEvent invoke(IAgentEvent agentEvent) {
+    public IAgentEvent invoke(IAgentEvent agentEvent) throws Exception {
 
         IAgentRuntimeContext runtimeContext = null;
 
+        IAgentGraph agentGraph = getAgentGraph();
+
+        runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
+                getAgentGraph());
+
         try {
-
-            IAgentGraph agentGraph = getAgentGraph();
-
-            runtimeContext = this.eventListener.beforeAgentInvoke(this, agentEvent,
-                    getAgentGraph());
 
             return agentGraph.invoke(runtimeContext);
 
@@ -49,41 +45,32 @@ public abstract class AgentBase implements IAgent {
         return agentEvent;
     }
 
-    @Override
-    public FunctionToolCallback<AsToolRequest, AsToolResponse> asToolCallback(IAgentEvent agentEvent) {
-        return FunctionToolCallback.builder(
-                getName(), new Function<AsToolRequest, AsToolResponse>() {
-                    @Override
-                    public AsToolResponse apply(AsToolRequest request) {
-                        IAgentEvent agentEventResult = null;
-                        try {
-                            agentEventResult = getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
-                                    agentEvent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return AsToolResponse.builder().isSuccess(false).errorMessage("表单未处理成功: " + e.getMessage())
-                                    .build();
-                        }
-                        if (agentEventResult.getAgentResponse() == null) {
-                            return AsToolResponse.builder().isSuccess(false)
-                                    .errorMessage("表单未处理成功: agent response is null")
-                                    .build();
-                        }
-                        if (agentEventResult.getAgentResponse().getResponseType() == EAgentResponseType.ERROR) {
-                            return AsToolResponse.builder().isSuccess(false)
-                                    .errorMessage("表单未处理成功: agent response is error:"
-                                            + agentEventResult.getAgentResponse().getResponseData())
-                                    .build();
-                        }
-                        return AsToolResponse.builder().isSuccess(true)
-                                .agentResponse(agentEventResult.getAgentResponse())
-                                .build();
-                    }
-                })
-                .description(getDescription())
-                .inputType(AsToolRequest.class)
-                .build();
-    }
+    // @Override
+    // public FunctionToolCallback<AsToolRequest, AsToolResponse>
+    // asToolCallback(IAgentEvent agentEvent) {
+    // return FunctionToolCallback.builder(
+    // getName(), new Function<AsToolRequest, AsToolResponse>() {
+    // @Override
+    // public AsToolResponse apply(AsToolRequest request) {
+    // try {
+    // getAgentStaticContext().getAgentEngine().invoke(AgentBase.this,
+    // agentEvent);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // return AsToolResponse.builder().isSuccess(false).message("未处理成功: " +
+    // e.getMessage())
+    // .build();
+    // }
+
+    // return AsToolResponse.builder().isSuccess(true)
+    // .message("已交由" + getName() + "处理" + getDescription())
+    // .build();
+    // }
+    // })
+    // .description(getDescription())
+    // .inputType(AsToolRequest.class)
+    // .build();
+    // }
 
     public class AgentGraphListener implements IAgentGraphListener {
 
@@ -125,10 +112,10 @@ public abstract class AgentBase implements IAgent {
                 try {
                     IAgentRuntimeContext agentRuntimeContext = AgentBase.this.getAgentStaticContext()
                             .getAgentSessionManage()
-                            .getAgentRuntimeContextById(
+                            .getAgentRuntimeContextById(state.get(IGraphState.getAgentSessionIDKey()).toString(),
                                     state.get(IGraphState.getAgentRuntimeContextIDKey()).toString());
 
-                    agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+                    agentEvent = agentRuntimeContext.getCurrentEvent();
 
                     AgentBase.this.eventListener.onComplete(AgentBase.this, agentEvent, agentRuntimeContext,
                             AgentBase.this.getAgentGraph().createOutput(agentRuntimeContext,

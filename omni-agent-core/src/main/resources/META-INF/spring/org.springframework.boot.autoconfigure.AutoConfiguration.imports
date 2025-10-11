@@ -1,0 +1,2 @@
+com.beraising.agent.omni.core.AgentCoreAutoConfiguration
+com.beraising.agent.omni.core.session.config.MyBatisConfiguration

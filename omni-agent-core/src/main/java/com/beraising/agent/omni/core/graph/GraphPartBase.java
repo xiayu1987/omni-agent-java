@@ -3,7 +3,6 @@ package com.beraising.agent.omni.core.graph;
 import org.springframework.ai.chat.client.ChatClient;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
-import com.beraising.agent.omni.core.common.ListUtils;
 import com.beraising.agent.omni.core.context.IAgentRuntimeContext;
 import com.beraising.agent.omni.core.context.IAgentStaticContext;
 import com.beraising.agent.omni.core.event.IAgentEvent;
@@ -59,13 +58,13 @@ public abstract class GraphPartBase<T extends IGraphState> implements IGraphPart
 
         }
 
-        IAgentRuntimeContext agentRuntimeContext = ListUtils.lastOf(agentSession.getAgentRuntimeContexts());
+        IAgentRuntimeContext currentRuntimeContext = agentSession.getCurrentRuntimeContext();
 
-        if (agentRuntimeContext == null) {
+        if (currentRuntimeContext == null) {
             throw new Exception("Agent runtime context not found for session ID: " + sessionId);
         }
 
-        IGraphState graphState = agentRuntimeContext.getGraphState();
+        IGraphState graphState = currentRuntimeContext.getGraphState();
 
         if (graphState == null) {
             throw new Exception("Graph state not found for session ID: " + sessionId);
@@ -73,8 +72,8 @@ public abstract class GraphPartBase<T extends IGraphState> implements IGraphPart
 
         graphState.setState(state);
 
-        IAgentEvent agentEvent = ListUtils.lastOf(agentRuntimeContext.getAgentEvents());
+        IAgentEvent currentEvent = currentRuntimeContext.getCurrentEvent();
 
-        return new StateInfo((T) graphState, agentRuntimeContext, agentEvent);
+        return new StateInfo((T) graphState, currentRuntimeContext, currentEvent);
     }
 }

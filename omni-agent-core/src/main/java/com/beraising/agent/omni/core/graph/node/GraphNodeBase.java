@@ -25,8 +25,13 @@ public abstract class GraphNodeBase<T extends IGraphState> extends GraphPartBase
 
         StateInfo stateInfo = getGraphState(state);
 
-        return apply((T) stateInfo.getGraphState(), stateInfo.getAgentRuntimeContext(), stateInfo.getAgentEvent())
-                .exec();
+        IUpdatedGraphState<T> updatedGraphState = apply((T) stateInfo.getGraphState(),
+                stateInfo.getAgentRuntimeContext(),
+                stateInfo.getAgentEvent());
+
+        getGraph().onGraphPartApplield(this, updatedGraphState, stateInfo.getGraphState(), stateInfo.getAgentRuntimeContext(), stateInfo.getAgentEvent());
+
+        return updatedGraphState.exec();
     }
 
     public abstract IUpdatedGraphState<T> apply(T graphState, IAgentRuntimeContext agentRuntimeContext,

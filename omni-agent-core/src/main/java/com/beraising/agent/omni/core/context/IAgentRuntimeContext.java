@@ -4,20 +4,21 @@ import java.util.List;
 
 import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.beraising.agent.omni.core.agents.IAgent;
+import com.beraising.agent.omni.core.event.EUserType;
 import com.beraising.agent.omni.core.event.IAgentEvent;
 import com.beraising.agent.omni.core.graph.state.IGraphState;
 
 public interface IAgentRuntimeContext extends IAgentContext {
-
-    String getAgentRuntimeContextID();
-
-    void setAgentRuntimeContextID(String agentRuntimeContextID);
 
     IGraphState getGraphState();
 
     void setGraphState(IGraphState graphState);
 
     List<IAgentEvent> getAgentEvents();
+
+    List<IAgentEvent> getAgentEventsByUserType(EUserType userType);
+
+    IAgentEvent getCurrentEvent();
 
     void setAgentEvents(List<IAgentEvent> agentEvents);
 
@@ -29,9 +30,21 @@ public interface IAgentRuntimeContext extends IAgentContext {
 
     void setCompiledGraph(CompiledGraph compiledGraph);
 
-    String getAgentSessionID();
+    String getAgentSessionId();
 
-    void setAgentSessionID(String agentSessionID);
+    void setAgentSessionId(String agentSessionId);
+
+    String getAgentRuntimeContextId();
+
+    void setAgentRuntimeContextId(String agentRuntimeContextId);
+
+    String getAgentName();
+
+    void setAgentName(String agentName);
+
+    int getGraphRunStatus();
+
+    void setGraphRunStatus(int graphRunStatus);
 
     boolean isEnd();
 

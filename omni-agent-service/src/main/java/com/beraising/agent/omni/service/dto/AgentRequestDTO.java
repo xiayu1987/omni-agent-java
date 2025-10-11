@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class AgentRequestDTO {
     private int requestType;
     private String requestData;
-
 }
