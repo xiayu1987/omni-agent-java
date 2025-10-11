@@ -197,18 +197,21 @@ public class OmniAgentEngine implements IAgentEngine {
                 return;
             }
 
+            IAgent nextAgent = agentRegistry.getAgentByName(nextIntentAgentName);
             // 情况 3: 意图改变 -> 结束上一个任务
             if (!isContinue && userCurrentRuntimeContext != null
                     && userCurrentRuntimeContext.getGraphRunStatus() >= 1) {
-                eventListener.onInvokeStream(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
-                        StreamContent.builder().isError(false).content("意图改变结束上一个任务").isComplete(false).build());
 
-                eventListener.onEndGraph(userCurrentRuntimeContext.getAgent(), userCurrentEvent,
-                        userCurrentRuntimeContext);
-                return;
+                if (nextAgent == null) {
+                    eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
+                            new Exception("无法识别意图"));
+                    return;
+                } else {
+                    eventListener.onEndGraph(userCurrentRuntimeContext.getAgent(), userCurrentEvent,
+                            userCurrentRuntimeContext);
+                }
             }
 
-            IAgent nextAgent = agentRegistry.getAgentByName(nextIntentAgentName);
             if (nextAgent == null) {
                 eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
                         new Exception("无法识别意图"));
@@ -218,7 +221,9 @@ public class OmniAgentEngine implements IAgentEngine {
                 nextAgent.invoke(userCurrentEvent);
             }
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
                     new Exception(e.getMessage()));
         }
