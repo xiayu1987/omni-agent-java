@@ -68,4 +68,12 @@ public class JsonUtils {
             return null;
         }
     }
+
+    public static String safeForJson(String s) {
+        if (s == null) {
+            return "";
+        }
+
+        return s.replace("\"", "\\\"");
+    }
 }
