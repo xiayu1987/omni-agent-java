@@ -3,23 +3,23 @@
 1. 正确提交返回：
 {
   "resultType": 0,
-  "message": "成功信息"
+  "message": ""//描述成功信息
 }
 
 2. 提交表单有业务错误：
 {
   "resultType": 1,
-  "message": "错误信息"
+  "message": ""//描述错误信息
 }
 
 3. 系统错误：
 {
   "resultType": 2,
-  "message": "错误信息"
+  "message": ""//描述错误信息
 }
 
 约束要求：
 - resultType 只能是 0、1 或 2
-- message 必须是字符串
+- message 必须是字符串，描述信息
 - 输出中只允许出现一个 JSON 对象
 - 不要包含解释、Markdown 或额外文本
