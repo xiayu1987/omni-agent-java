@@ -211,10 +211,10 @@ public class OmniAgentEngine implements IAgentEngine {
                     .getAsJsonObject();
 
             boolean isSuccess = obj.has("isSuccess") && obj.get("isSuccess").getAsBoolean();
+            String msg = obj.has("message") ? obj.get("message").getAsString() : "意图识别失败";
+
             if (!isSuccess) {
-                // 错误情况
-                String errMsg = obj.has("message") ? obj.get("message").getAsString() : "意图识别失败";
-                eventListener.onError(intentAgent, userCurrentEvent, null, new Exception(errMsg));
+                eventListener.onError(intentAgent, userCurrentEvent, null, new Exception(msg));
                 return;
             }
 
@@ -225,8 +225,6 @@ public class OmniAgentEngine implements IAgentEngine {
             // 情况 1: 模糊意图
             if (isAmbiguous) {
                 // 这里不要直接切换或结束，而是提示用户确认
-                String msg = obj.has("message") ? obj.get("message").getAsString() : "意图不明确，请确认是否继续当前任务";
-
                 eventListener.onInvokeStream(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
                         StreamContent.builder().isError(false).content(msg).isComplete(false).build());
 
@@ -256,7 +254,7 @@ public class OmniAgentEngine implements IAgentEngine {
 
                 if (nextAgent == null) {
                     eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
-                            new Exception("无法识别意图"));
+                            new Exception(msg));
                     return;
                 } else {
                     eventListener.onEndGraph(userCurrentRuntimeContext.getAgent(), userCurrentEvent,
@@ -266,7 +264,7 @@ public class OmniAgentEngine implements IAgentEngine {
 
             if (nextAgent == null) {
                 eventListener.onError(intentAgent, userCurrentEvent, userCurrentRuntimeContext,
-                        new Exception("无法识别意图"));
+                        new Exception(msg));
             } else {
 
                 nextAgent.init(eventListener);

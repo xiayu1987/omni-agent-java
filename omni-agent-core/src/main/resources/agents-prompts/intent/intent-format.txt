@@ -16,7 +16,7 @@
   "isContinue": false,
   "isAmbiguous": false,
   "nextAgentName": "",//新agent名称
-  "message": "意图发生改变"
+  "message": ""//描述意图发生改变
 }
 
 3. 如果意图模糊，看似与当前任务一致但不确定：
@@ -25,11 +25,11 @@
   "isContinue": true,
   "isAmbiguous": true,
   "nextAgentName": "",
-  "message": "用户表达可能延续上一个任务，但语义模糊，请求确认"
+  "message": ""//描述用户表达可能延续上一个任务，但语义模糊，请求确认
 }
 
 4. 如果无法识别或出错：
 {
   "isSuccess": false,
-  "message": "错误信息"
+  "message": ""//描述错误信息
 }

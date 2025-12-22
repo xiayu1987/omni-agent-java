@@ -25,6 +25,7 @@ let sessionState = ref<ReturnType<typeof getState>>(getState())
 onMounted(async () => {
   await loadSessions()
   sessionState.value = getState()
+  handleSelect(sessionState.value.currentId ?? "")
 })
 
 // 重命名逻辑
@@ -51,6 +52,7 @@ async function handleSelect(id: string) {
 async function handleNewSession() {
   addNewSession()
   sessionState.value = getState()
+  handleSelect(sessionState.value.currentId ?? "")
 }
 
 async function updateSession(id: string) {
